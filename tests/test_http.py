@@ -78,6 +78,23 @@ class LocalHttpSecurityTests(unittest.TestCase):
         self.assertEqual(len(payload["games"]), 3)
         self.service.client.search_store_games.assert_called_once_with("test")
 
+    def test_overlay_keeps_all_filters_and_adds_a_pinned_view(self):
+        with urllib.request.urlopen(self.base_url + "/overlay", timeout=3) as response:
+            html = response.read().decode("utf-8")
+        self.assertIn('data-view="all"', html)
+        self.assertIn('data-view="pinned"', html)
+        self.assertIn('data-filter="unlocked"', html)
+        self.assertIn('data-filter="locked"', html)
+        self.assertIn('pinnedIds.length>=3', html)
+        self.assertIn('localStorage.setItem', html)
+
+    def test_overlay_uses_larger_achievement_typography(self):
+        with urllib.request.urlopen(self.base_url + "/overlay", timeout=3) as response:
+            html = response.read().decode("utf-8")
+        self.assertIn('.ach-name{font-size:18px', html)
+        self.assertIn('.ach-desc{font-size:13px', html)
+        self.assertIn('.achievement img{width:58px;height:58px', html)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

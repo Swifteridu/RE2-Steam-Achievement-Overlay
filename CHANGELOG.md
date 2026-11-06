@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0 — Readable overlay, pinned objectives and full-game search
+
+- Increased achievement card sizes, icon dimensions, headings and description text for better stream readability.
+- Added a dedicated Pinned view for up to three achievements, with pins saved locally per Steam account and game.
+- Preserved the complete achievement list and the All / Unlocked / Locked filters.
+- Changed Steam Store search to verify candidate items through AppDetails and return full games only; DLC, demos, soundtracks, software and unknown item types are excluded.
+- Updated the project disclaimer to refer to rights holders collectively rather than naming individual publishers.
+- Updated OBS Browser Source recommended dimensions to 560 × 900.
+
 ## 1.2.0 — Universal Steam game selection
 
 - Added Steam Store game search and manual AppID / Store URL selection.

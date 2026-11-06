@@ -1,24 +1,144 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Steam Achievement Overlay</title>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam Achievement Overlay</title>
 <style>
-:root{color-scheme:dark;--red:#c52b31;--text:#eeeae2;--muted:#a0a5a4;--line:rgba(209,216,211,.17)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;color:var(--text);font-family:"Segoe UI",Arial,sans-serif}
-#shell{width:100%;height:100%;padding:5px}.board{height:100%;display:flex;flex-direction:column;background:linear-gradient(145deg,rgba(28,33,34,.97),rgba(8,11,12,.97) 62%);border:1px solid rgba(205,211,205,.28);border-top:3px solid var(--red);box-shadow:0 12px 45px #0009;overflow:hidden;position:relative}.board:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.11;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff 4px,transparent 5px);mix-blend-mode:soft-light}
-.header{padding:15px 17px 12px;border-bottom:1px solid var(--line);position:relative;z-index:1}.eyebrow{font-size:9px;letter-spacing:.24em;color:#db656a;font-weight:800;text-transform:uppercase}.heading{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-top:5px}.game-title{font-size:20px;font-weight:900;letter-spacing:.045em;text-transform:uppercase;line-height:1.1;overflow-wrap:anywhere}.edition{font-size:9px;letter-spacing:.12em;color:#aab0ad;border:1px solid #596064;padding:4px 6px;white-space:nowrap}.progress-line{display:flex;justify-content:space-between;align-items:baseline;margin-top:15px}.progress-number{font-size:31px;line-height:1;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums}.progress-number span{font-size:15px;color:#a7acab;font-weight:600}.percent{font-size:12px;letter-spacing:.1em;color:#e6ded5;font-weight:700}.bar{height:5px;background:#3c4142;margin-top:9px;overflow:hidden}.bar-fill{height:100%;width:0;background:linear-gradient(90deg,#7d1d24,#e24a50);transition:width .45s ease}.meta{display:flex;justify-content:space-between;gap:8px;margin-top:7px;color:#8e9695;font-size:9px;letter-spacing:.13em;text-transform:uppercase}.controls{display:flex;gap:5px;padding:10px 12px;border-bottom:1px solid var(--line);position:relative;z-index:1}.filter{background:#111617;border:1px solid #3c4446;color:#9fa6a4;padding:7px 9px;font-size:9px;letter-spacing:.1em;font-weight:800;cursor:pointer;flex:1}.filter.active{background:#6f1c21;border-color:#b33b41;color:#fff}.list-wrap{position:relative;z-index:1;overflow:auto;flex:1;scrollbar-width:thin;scrollbar-color:#5b3235 #151a1b;padding:8px 10px 12px}.group-label{font-size:9px;font-weight:900;letter-spacing:.2em;color:#d66b70;text-transform:uppercase;padding:9px 4px 7px;display:flex;justify-content:space-between}.group-label.locked{color:#929a98}.achievement{display:flex;align-items:center;gap:10px;min-height:57px;margin:0 0 6px;padding:7px 9px;background:linear-gradient(90deg,rgba(43,49,49,.8),rgba(23,28,29,.76));border:1px solid rgba(193,201,194,.12);position:relative}.achievement.unlocked{border-left:2px solid #9ebba5}.achievement.locked{opacity:.66;border-left:2px solid #666}.achievement img{width:35px;height:35px;object-fit:contain;flex:0 0 35px;filter:grayscale(1);opacity:.58}.achievement.unlocked img{filter:none;opacity:1}.ach-copy{min-width:0;flex:1}.ach-name{font-size:11px;line-height:1.2;font-weight:800;color:#e9e8e1;letter-spacing:.015em}.ach-desc{font-size:9px;line-height:1.3;color:#9fa5a2;margin-top:3px;white-space:normal}.state{font-size:7px;letter-spacing:.09em;font-weight:900;padding:4px 5px;border:1px solid #57605f;color:#9ea6a3;white-space:nowrap}.unlocked .state{color:#b9d4be;border-color:#52745b;background:#17231b}.empty{color:#a3a9a7;font-size:11px;padding:25px 8px;text-align:center;line-height:1.6}.footer{padding:8px 12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.14em;color:#858d8c;position:relative;z-index:1}.live{display:flex;align-items:center;gap:6px}.dot{width:6px;height:6px;border-radius:50%;background:#8bb79a;box-shadow:0 0 7px #8bb79a}.dot.off{background:#c45a5e;box-shadow:0 0 7px #c45a5e}.toast{position:absolute;z-index:5;top:10px;left:10px;right:10px;display:flex;align-items:center;gap:10px;padding:11px;background:linear-gradient(100deg,#51181c,#1a1d1e);border:1px solid #d15a60;box-shadow:0 8px 25px #000b;transform:translateY(-150%);opacity:0;transition:transform .35s ease,opacity .35s ease}.toast.show{transform:translateY(0);opacity:1}.toast img{width:38px;height:38px;object-fit:contain}.toast-kicker{font-size:8px;letter-spacing:.18em;color:#f18a8e;font-weight:900}.toast-name{font-size:12px;font-weight:900;margin-top:2px}.error{font-size:10px;color:#e4a4a6;text-align:center;padding:18px;line-height:1.5}
-</style></head>
-<body><div id="shell"><section class="board">
-<div class="toast" id="toast"><img id="toastIcon" alt=""><div><div class="toast-kicker">ACHIEVEMENT UNLOCKED</div><div class="toast-name" id="toastName"></div></div></div>
-<header class="header"><div class="eyebrow">Steam · Achievement record</div><div class="heading"><div class="game-title" id="gameTitle">Steam Achievement Tracker</div><div class="edition" id="gameEdition">STEAM</div></div>
-<div class="progress-line"><div class="progress-number" id="count">-- <span>/ --</span></div><div class="percent" id="percent">--%</div></div><div class="bar"><div class="bar-fill" id="barFill"></div></div><div class="meta"><span>Completion status</span><span id="remaining">Waiting for Steam…</span></div></header>
-<nav class="controls" aria-label="Achievement filters"><button class="filter active" data-filter="all">ALL <span id="allCount">0</span></button><button class="filter" data-filter="unlocked">UNLOCKED <span id="unlockedCount">0</span></button><button class="filter" data-filter="locked">LOCKED <span id="lockedCount">0</span></button></nav>
-<main class="list-wrap" id="list"><div class="empty">CONNECT STEAM TO LOAD YOUR ACHIEVEMENT RECORD.</div></main>
-<footer class="footer"><div class="live"><span class="dot off" id="connectionDot"></span><span id="connectionText">WAITING FOR LOCAL HELPER</span></div><span id="updated">AUTO-SYNC · 30 SEC</span></footer>
+:root{color-scheme:dark;--red:#c52b31;--red-bright:#e04a51;--text:#f1eee8;--muted:#aeb4b1;--line:rgba(209,216,211,.17);--green:#a6d4b1;--panel:#0d1112}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;color:var(--text);font-family:"Segoe UI",Arial,sans-serif}
+button{font:inherit}
+#shell{width:100%;height:100%;padding:6px}
+.board{height:100%;display:flex;flex-direction:column;background:linear-gradient(145deg,rgba(28,33,34,.985),rgba(7,10,11,.985) 66%);border:1px solid rgba(205,211,205,.3);border-top:4px solid var(--red);box-shadow:0 14px 48px #000a;overflow:hidden;position:relative}
+.board:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.08;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff 4px,transparent 5px);mix-blend-mode:soft-light}
+.header{padding:20px 22px 16px;border-bottom:1px solid var(--line);position:relative;z-index:1;background:linear-gradient(120deg,rgba(35,40,41,.72),transparent 76%)}
+.eyebrow{font-size:12px;letter-spacing:.22em;color:#e16a70;font-weight:900;text-transform:uppercase}
+.heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-top:7px}
+.game-title{font-size:27px;font-weight:950;letter-spacing:.035em;text-transform:uppercase;line-height:1.12;overflow-wrap:anywhere;text-shadow:0 2px 12px #000a}
+.edition{font-size:11px;letter-spacing:.1em;color:#c4cbc7;border:1px solid #596064;padding:6px 8px;white-space:nowrap;background:#101516}
+.progress-line{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px}
+.progress-number{font-size:43px;line-height:1;font-weight:950;letter-spacing:.015em;font-variant-numeric:tabular-nums}
+.progress-number span{font-size:21px;color:#b9c0bc;font-weight:650}
+.percent{font-size:16px;letter-spacing:.1em;color:#f0e9df;font-weight:850}
+.bar{height:7px;background:#3c4142;margin-top:11px;overflow:hidden;border-radius:1px}
+.bar-fill{height:100%;width:0;background:linear-gradient(90deg,#7d1d24,#ed555c);transition:width .45s ease}
+.meta{display:flex;justify-content:space-between;gap:8px;margin-top:9px;color:#a0a8a5;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.view-tabs{display:flex;gap:7px;padding:12px 14px 8px;position:relative;z-index:1}
+.view-tab{flex:1;min-width:0;border:1px solid #454e50;background:#111718;color:#b3bbb7;padding:11px 10px;font-size:12px;letter-spacing:.09em;font-weight:900;cursor:pointer;text-align:center}
+.view-tab span{color:#e8e4db;margin-left:5px;font-variant-numeric:tabular-nums}
+.view-tab.active{background:linear-gradient(110deg,#7c1d23,#a92a31);border-color:#d34c53;color:#fff;box-shadow:inset 0 1px #ffffff20}
+.view-tab.active span{color:#fff}
+.controls{display:flex;gap:7px;padding:4px 14px 11px;border-bottom:1px solid var(--line);position:relative;z-index:1}
+.controls.hidden{display:none}
+.filter{background:#111718;border:1px solid #41494b;color:#b4bcb8;padding:9px 10px;font-size:12px;letter-spacing:.075em;font-weight:900;cursor:pointer;flex:1}
+.filter.active{background:#5e1b20;border-color:#b9474d;color:#fff}
+.pin-hint{position:relative;z-index:1;padding:8px 18px 3px;min-height:27px;color:#9fa8a4;font-size:11px;letter-spacing:.025em}
+.pin-hint strong{color:#e9d5d1}
+.list-wrap{position:relative;z-index:1;overflow:auto;overscroll-behavior:contain;flex:1;scrollbar-width:thin;scrollbar-color:#704044 #151a1b;padding:7px 12px 14px}
+.group-label{font-size:12px;font-weight:950;letter-spacing:.18em;color:#e4777c;text-transform:uppercase;padding:10px 5px 9px;display:flex;justify-content:space-between;align-items:center}
+.group-label.locked{color:#aeb7b2}
+.achievement{display:flex;align-items:center;gap:12px;min-height:91px;margin:0 0 8px;padding:10px 12px;background:linear-gradient(100deg,rgba(43,49,49,.94),rgba(19,24,25,.9));border:1px solid rgba(193,201,194,.17);position:relative;border-radius:2px}
+.achievement.unlocked{border-left:3px solid #91bd9d}
+.achievement.locked{border-left:3px solid #727c78}
+.achievement img{width:58px;height:58px;object-fit:contain;flex:0 0 58px;filter:grayscale(1);opacity:.63;background:#0e1213;border:1px solid #4b5553;border-radius:3px}
+.achievement.unlocked img{filter:none;opacity:1}
+.ach-copy{min-width:0;flex:1}
+.ach-name{font-size:18px;line-height:1.2;font-weight:900;color:#f0eee8;letter-spacing:.005em;overflow-wrap:anywhere}
+.ach-desc{font-size:13px;line-height:1.35;color:#b2bab6;margin-top:5px;white-space:normal;overflow-wrap:anywhere}
+.state{font-size:10px;letter-spacing:.08em;font-weight:950;padding:6px 7px;border:1px solid #626d68;color:#c0c8c3;white-space:nowrap;border-radius:2px}
+.unlocked .state{color:#c6e4cc;border-color:#5f8a68;background:#17251c}
+.pin-button{width:37px;height:37px;flex:0 0 37px;display:grid;place-items:center;border:1px solid #59615e;background:#101516;color:#b5bdb8;border-radius:3px;font-size:23px;line-height:1;cursor:pointer;padding:0}
+.pin-button:hover{border-color:#d45b61;color:#fff;background:#38191c}
+.pin-button.pinned{color:#ffd77a;border-color:#a77b36;background:#2b2416}
+.pin-button:focus-visible,.filter:focus-visible,.view-tab:focus-visible{outline:2px solid #f08b90;outline-offset:2px}
+.pinned-card{display:flex;align-items:center;gap:16px;min-height:145px;margin:0 0 12px;padding:17px;background:linear-gradient(115deg,rgba(51,43,34,.97),rgba(22,26,26,.97) 68%);border:1px solid rgba(210,174,105,.35);border-left:4px solid #d2a65e;box-shadow:0 5px 18px #0005}
+.pinned-card.locked{border-left-color:#8b9290}
+.pinned-card img{width:76px;height:76px;flex:0 0 76px;object-fit:contain;border:1px solid #726653;background:#111516;border-radius:3px}
+.pinned-copy{min-width:0;flex:1}
+.pinned-label{font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase;color:#edc77f;margin-bottom:6px}
+.pinned-card.locked .pinned-label{color:#b3bdba}
+.pinned-name{font-size:21px;line-height:1.16;font-weight:950;color:#fff;overflow-wrap:anywhere}
+.pinned-desc{font-size:14px;line-height:1.4;color:#c3c9c5;margin-top:6px;overflow-wrap:anywhere}
+.pinned-card .state{display:inline-block;margin-top:8px}
+.empty{color:#b0b8b4;font-size:15px;padding:35px 18px;text-align:center;line-height:1.55;border:1px dashed #46504d;background:#111617}
+.empty strong{display:block;font-size:17px;color:#f0e9df;margin-bottom:7px}
+.footer{padding:10px 15px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:10px;letter-spacing:.11em;color:#a0a8a4;position:relative;z-index:1;background:#0c1011}
+.live{display:flex;align-items:center;gap:8px;min-width:0}
+.dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#8bb79a;box-shadow:0 0 8px #8bb79a}
+.dot.off{background:#c45a5e;box-shadow:0 0 8px #c45a5e}
+.toast{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;align-items:center;gap:13px;padding:14px;background:linear-gradient(100deg,#51181c,#1a1d1e);border:1px solid #d15a60;box-shadow:0 8px 25px #000b;transform:translateY(-160%);opacity:0;transition:transform .35s ease,opacity .35s ease}
+.toast.show{transform:translateY(0);opacity:1}
+.toast img{width:52px;height:52px;object-fit:contain}
+.toast-kicker{font-size:10px;letter-spacing:.16em;color:#f18a8e;font-weight:950}
+.toast-name{font-size:17px;font-weight:950;margin-top:4px}
+.error{font-size:14px;color:#e4a4a6;text-align:center;padding:25px;line-height:1.55}
+@media(max-width:520px){
+ .header{padding:15px 15px 13px}.game-title{font-size:22px}.edition{font-size:9px;padding:5px 6px}.progress-number{font-size:36px}.progress-number span{font-size:17px}.percent{font-size:13px}
+ .view-tabs{padding:9px 9px 6px}.view-tab{font-size:10px;padding:9px 6px}.controls{padding:4px 9px 9px}.filter{font-size:10px;padding:8px 5px}.pin-hint{padding:7px 12px 3px;font-size:10px}
+ .list-wrap{padding:5px 8px 10px}.achievement{gap:8px;min-height:78px;padding:8px}.achievement img{width:47px;height:47px;flex-basis:47px}.ach-name{font-size:15px}.ach-desc{font-size:11px}.state{font-size:8px;padding:5px}.pin-button{width:32px;height:32px;flex-basis:32px;font-size:20px}
+ .pinned-card{gap:10px;min-height:116px;padding:11px}.pinned-card img{width:58px;height:58px;flex-basis:58px}.pinned-name{font-size:17px}.pinned-desc{font-size:12px}.footer{font-size:8px;padding:8px 10px}
+}
+</style>
+</head>
+<body>
+<div id="shell"><section class="board">
+  <div class="toast" id="toast"><img id="toastIcon" alt=""><div><div class="toast-kicker">ACHIEVEMENT UNLOCKED</div><div class="toast-name" id="toastName"></div></div></div>
+  <header class="header">
+    <div class="eyebrow">Steam · Achievement record</div>
+    <div class="heading"><div class="game-title" id="gameTitle">Steam Achievement Tracker</div><div class="edition" id="gameEdition">STEAM</div></div>
+    <div class="progress-line"><div class="progress-number" id="count">-- <span>/ --</span></div><div class="percent" id="percent">--%</div></div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <div class="meta"><span>Completion status</span><span id="remaining">Waiting for Steam…</span></div>
+  </header>
+  <nav class="view-tabs" aria-label="Achievement views">
+    <button class="view-tab active" data-view="all">ALL ACHIEVEMENTS <span id="allViewCount">0</span></button>
+    <button class="view-tab" data-view="pinned">PINNED <span id="pinnedCount">0/3</span></button>
+  </nav>
+  <nav class="controls" id="filters" aria-label="Achievement filters">
+    <button class="filter active" data-filter="all">ALL <span id="allCount">0</span></button>
+    <button class="filter" data-filter="unlocked">UNLOCKED <span id="unlockedCount">0</span></button>
+    <button class="filter" data-filter="locked">LOCKED <span id="lockedCount">0</span></button>
+  </nav>
+  <div class="pin-hint" id="pinHint">Select the ☆ on an achievement to pin it. You can pin up to <strong>3 achievements</strong>.</div>
+  <main class="list-wrap" id="list"><div class="empty">CONNECT STEAM TO LOAD YOUR ACHIEVEMENT RECORD.</div></main>
+  <footer class="footer"><div class="live"><span class="dot off" id="connectionDot"></span><span id="connectionText">WAITING FOR LOCAL HELPER</span></div><span id="updated">AUTO-SYNC · 30 SEC</span></footer>
 </section></div>
 <script>
-const listEl=document.getElementById('list');let currentFilter='all',firstLoad=true,seenEvents=new Set(),toastQueue=[],toastTimer=null,toastActive=false;
+const listEl=document.getElementById('list');
+let currentView='all',currentFilter='all',firstLoad=true,seenEvents=new Set(),toastQueue=[],toastTimer=null,toastActive=false;
+let lastData=null,pinScope='',pinnedIds=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function pinStorageKey(data){return `steam-achievement-overlay:pins:${data.steamid||'unknown'}:${data.appid||'unknown'}`;}
+function loadPinsForScope(data){
+ const nextScope=pinStorageKey(data);
+ if(nextScope===pinScope)return;
+ pinScope=nextScope;pinnedIds=[];
+ try{const stored=JSON.parse(localStorage.getItem(pinScope)||'[]');if(Array.isArray(stored))pinnedIds=stored.filter(x=>typeof x==='string').slice(0,3);}catch(_){pinnedIds=[];}
+}
+function savePins(){try{localStorage.setItem(pinScope,JSON.stringify(pinnedIds.slice(0,3)));}catch(_){/* Pinning still works for the current overlay session. */}}
+function updatePinHint(message){document.getElementById('pinHint').innerHTML=message;}
+function pinButton(apiName,isPinned){
+ const label=isPinned?'Unpin achievement':'Pin achievement';
+ return `<button type="button" class="pin-button ${isPinned?'pinned':''}" data-pin="${esc(apiName)}" aria-label="${label}" aria-pressed="${isPinned}">${isPinned?'★':'☆'}</button>`;
+}
+function achievementImage(a){return esc(a.unlocked?(a.icon||a.icon_gray):(a.icon_gray||a.icon));}
+function allItemHtml(a){
+ const isPinned=pinnedIds.includes(a.api_name);
+ return `<article class="achievement ${a.unlocked?'unlocked':'locked'}"><img src="${achievementImage(a)}" alt="" onerror="this.style.visibility='hidden'"><div class="ach-copy"><div class="ach-name">${esc(a.name)}</div><div class="ach-desc">${esc(a.description||'Hidden achievement')}</div></div>${pinButton(a.api_name,isPinned)}<span class="state">${a.unlocked?'UNLOCKED':'LOCKED'}</span></article>`;
+}
+function pinnedItemHtml(a){
+ const isPinned=pinnedIds.includes(a.api_name);
+ return `<article class="pinned-card ${a.unlocked?'unlocked':'locked'}"><img src="${achievementImage(a)}" alt="" onerror="this.style.visibility='hidden'"><div class="pinned-copy"><div class="pinned-label">Pinned achievement · ${a.unlocked?'Completed':'Objective'}</div><div class="pinned-name">${esc(a.name)}</div><div class="pinned-desc">${esc(a.description||'Hidden achievement')}</div><span class="state">${a.unlocked?'UNLOCKED':'LOCKED'}</span></div>${pinButton(a.api_name,isPinned)}</article>`;
+}
+function showNextToast(){
+ if(toastActive||!toastQueue.length)return;
+ toastActive=true;const event=toastQueue.shift(),toast=document.getElementById('toast'),icon=document.getElementById('toastIcon');
+ document.getElementById('toastName').textContent=event.name||'Achievement unlocked';icon.src=event.icon||'';toast.classList.add('show');
+ toastTimer=setTimeout(()=>{toast.classList.remove('show');toastActive=false;setTimeout(showNextToast,450);},5200);
+}
 function render(data){
+ lastData=data;
  const total=Number(data.total||0),unlocked=Number(data.unlocked||0),locked=Math.max(0,total-unlocked),pct=total?Math.round(unlocked/total*100):0;
  document.getElementById('gameTitle').textContent=data.game_name||'Steam Achievement Tracker';
  document.getElementById('gameEdition').textContent=data.appid?`APP ${data.appid}`:'STEAM';
@@ -26,22 +146,52 @@ function render(data){
  document.getElementById('percent').textContent=`${pct}%`;
  document.getElementById('barFill').style.width=`${pct}%`;
  document.getElementById('remaining').textContent=total?`${locked} REMAINING`:'NO ACHIEVEMENTS';
- document.getElementById('allCount').textContent=total;document.getElementById('unlockedCount').textContent=unlocked;document.getElementById('lockedCount').textContent=locked;
+ document.getElementById('allCount').textContent=total;document.getElementById('allViewCount').textContent=total;
+ document.getElementById('unlockedCount').textContent=unlocked;document.getElementById('lockedCount').textContent=locked;
  const dot=document.getElementById('connectionDot');dot.classList.toggle('off',!data.connected);
  document.getElementById('connectionText').textContent=data.status==='stale'?'STEAM DATA STALE':(data.connected?'STEAM CONNECTED':(data.status==='setup_required'?'SETUP REQUIRED':'STEAM CONNECTION ISSUE'));
  document.getElementById('updated').textContent=data.last_updated?`SYNCED ${new Date(data.last_updated).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'AUTO-SYNC · 30 SEC';
- if(!data.connected){listEl.innerHTML=`<div class="error">${esc(data.error||'Steam is not connected. Open the setup page on your PC.')}</div>`;return;}
+ document.querySelectorAll('.view-tab').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
+ document.getElementById('filters').classList.toggle('hidden',currentView==='pinned');
+ if(!data.connected){document.getElementById('pinnedCount').textContent='0/3';listEl.innerHTML=`<div class="error">${esc(data.error||'Steam is not connected. Open the setup page on your PC.')}</div>`;return;}
+ loadPinsForScope(data);
  const achievements=Array.isArray(data.achievements)?data.achievements:[];
- const visible=achievements.filter(a=>currentFilter==='all'||(currentFilter==='unlocked'?a.unlocked:!a.unlocked));
- const unlockedItems=visible.filter(a=>a.unlocked),lockedItems=visible.filter(a=>!a.unlocked);
- const itemHtml=a=>`<article class="achievement ${a.unlocked?'unlocked':'locked'}"><img src="${esc(a.unlocked?(a.icon||a.icon_gray):(a.icon_gray||a.icon))}" alt="" onerror="this.style.visibility='hidden'"><div class="ach-copy"><div class="ach-name">${esc(a.name)}</div><div class="ach-desc">${esc(a.description||'Hidden achievement')}</div></div><span class="state">${a.unlocked?'UNLOCKED':'LOCKED'}</span></article>`;
- let html='';if(unlockedItems.length){html+=`<div class="group-label">UNLOCKED <span>${unlockedItems.length}</span></div>`+unlockedItems.map(itemHtml).join('');}if(lockedItems.length){html+=`<div class="group-label locked">STILL TO OBTAIN <span>${lockedItems.length}</span></div>`+lockedItems.map(itemHtml).join('');}
- listEl.innerHTML=html||'<div class="empty">No achievements in this filter.</div>';
+ const knownNames=new Set(achievements.map(a=>a.api_name));
+ const cleanPins=pinnedIds.filter(id=>knownNames.has(id));
+ if(cleanPins.length!==pinnedIds.length){pinnedIds=cleanPins;savePins();}
+ document.getElementById('pinnedCount').textContent=`${pinnedIds.length}/3`;
+ if(currentView==='pinned'){
+   updatePinHint('Your pinned objectives are shown here. Return to <strong>All achievements</strong> to browse and pin another achievement.');
+   const pinnedItems=pinnedIds.map(id=>achievements.find(a=>a.api_name===id)).filter(Boolean);
+   listEl.innerHTML=pinnedItems.length?pinnedItems.map(pinnedItemHtml).join(''):'<div class="empty"><strong>No pinned achievements yet</strong>Open All Achievements and select the ☆ beside up to three achievements. Your pins are saved locally for this Steam account and game.</div>';
+ }else{
+   updatePinHint('Select the ☆ on an achievement to pin it. You can pin up to <strong>3 achievements</strong>.');
+   const visible=achievements.filter(a=>currentFilter==='all'||(currentFilter==='unlocked'?a.unlocked:!a.unlocked));
+   const unlockedItems=visible.filter(a=>a.unlocked),lockedItems=visible.filter(a=>!a.unlocked);
+   let html='';
+   if(unlockedItems.length)html+=`<div class="group-label">UNLOCKED <span>${unlockedItems.length}</span></div>`+unlockedItems.map(allItemHtml).join('');
+   if(lockedItems.length)html+=`<div class="group-label locked">STILL TO OBTAIN <span>${lockedItems.length}</span></div>`+lockedItems.map(allItemHtml).join('');
+   listEl.innerHTML=html||'<div class="empty">No achievements in this filter.</div>';
+ }
  const events=Array.isArray(data.new_unlocks)?data.new_unlocks:[];
- if(firstLoad){events.forEach(e=>{if(e.id)seenEvents.add(e.id);});firstLoad=false;}else{events.forEach(e=>{if(e.id&&!seenEvents.has(e.id)){seenEvents.add(e.id);toastQueue.push(e);}});showNextToast();}
+ if(firstLoad){events.forEach(e=>{if(e.id)seenEvents.add(e.id);});firstLoad=false;}
+ else{events.forEach(e=>{if(e.id&&!seenEvents.has(e.id)){seenEvents.add(e.id);toastQueue.push(e);}});showNextToast();}
 }
-function showNextToast(){if(toastActive||!toastQueue.length)return;toastActive=true;const event=toastQueue.shift(),toast=document.getElementById('toast'),icon=document.getElementById('toastIcon');document.getElementById('toastName').textContent=event.name||'Achievement unlocked';icon.src=event.icon||'';toast.classList.add('show');toastTimer=setTimeout(()=>{toast.classList.remove('show');toastActive=false;setTimeout(showNextToast,400);},5000);}
-document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{currentFilter=btn.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));fetchData();}));
+listEl.addEventListener('click',event=>{
+ const button=event.target.closest('[data-pin]');if(!button||!lastData||!lastData.connected)return;
+ const apiName=button.dataset.pin;
+ if(pinnedIds.includes(apiName)){
+   pinnedIds=pinnedIds.filter(id=>id!==apiName);updatePinHint('Achievement unpinned. You have <strong>'+ (3-pinnedIds.length) + ' pin slot(s)</strong> available.');
+ }else{
+   if(pinnedIds.length>=3){updatePinHint('<strong>Pin limit reached.</strong> Unpin an achievement before adding another.');return;}
+   pinnedIds=[...pinnedIds,apiName];updatePinHint('Achievement pinned. <strong>'+pinnedIds.length+'/3</strong> pin slots used.');
+ }
+ savePins();render(lastData);
+});
+document.querySelectorAll('.view-tab').forEach(button=>button.addEventListener('click',()=>{currentView=button.dataset.view;render(lastData||{});}));
+document.querySelectorAll('.filter').forEach(button=>button.addEventListener('click',()=>{currentFilter=button.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===button));render(lastData||{});}));
 async function fetchData(){try{const response=await fetch('/api/achievements',{cache:'no-store'});const data=await response.json();render(data);}catch(err){document.getElementById('connectionText').textContent='LOCAL HELPER OFFLINE';document.getElementById('connectionDot').classList.add('off');}}
 fetchData();setInterval(fetchData,3000);
-</script></body></html>
+</script>
+</body>
+</html>

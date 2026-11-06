@@ -32,24 +32,58 @@ class SteamClientTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.client.normalize_steam_id("https://example.com/id/player", VALID_KEY)
 
-    def test_search_store_games_returns_at_most_three_valid_results(self):
-        payload = {"items": [
-            {"id": index, "name": f"Game {index}", "tiny_image": f"https://example.test/{index}.jpg"}
-            for index in range(1, 8)
+    def test_search_store_games_returns_three_full_games_and_skips_dlc(self):
+        search_payload = {"items": [
+            {"id": 1, "name": "DLC Pack", "type": "app"},
+            {"id": 2, "name": "Game Two", "type": "app"},
+            {"id": 3, "name": "Soundtrack", "type": "app"},
+            {"id": 4, "name": "Game Four", "type": "app"},
+            {"id": 5, "name": "Game Five", "type": "app"},
+            {"id": 6, "name": "Game Six", "type": "app"},
         ]}
-        with patch.object(self.client, "store_get", return_value=payload):
+        details_payload = {
+            "1": {"success": True, "data": {"type": "dlc", "name": "DLC Pack"}},
+            "2": {"success": True, "data": {"type": "game", "name": "Game Two"}},
+            "3": {"success": True, "data": {"type": "music", "name": "Soundtrack"}},
+            "4": {"success": True, "data": {"type": "game", "name": "Game Four"}},
+            "5": {"success": True, "data": {"type": "demo", "name": "Game Five Demo"}},
+            "6": {"success": True, "data": {"type": "game", "name": "Game Six"}},
+        }
+        detail_responses = [
+            {str(appid): {"success": True, "data": details}}
+            for appid, details in (
+                (1, {"type": "dlc", "name": "DLC Pack"}),
+                (2, {"type": "game", "name": "Game Two"}),
+                (3, {"type": "music", "name": "Soundtrack"}),
+                (4, {"type": "game", "name": "Game Four"}),
+                (5, {"type": "demo", "name": "Game Five Demo"}),
+                (6, {"type": "game", "name": "Game Six"}),
+            )
+        ]
+        with patch.object(self.client, "store_get", side_effect=[search_payload, *detail_responses]) as store_get:
             results = self.client.search_store_games("Example")
+        self.assertEqual([item["appid"] for item in results], [2, 4, 6])
         self.assertEqual(len(results), 3)
-        self.assertEqual([item["appid"] for item in results], [1, 2, 3])
+        self.assertEqual(store_get.call_count, 7)
+        self.assertEqual(store_get.call_args_list[1].args[0], "api/appdetails/")
+        self.assertEqual(store_get.call_args_list[1].args[1]["appids"], 1)
+        self.assertEqual(store_get.call_args_list[1].args[1]["filters"], "basic")
 
-    def test_search_discards_invalid_appids_before_limit(self):
-        payload = {"items": [
+    def test_search_discards_invalid_appids_and_unknown_or_non_game_types(self):
+        search_payload = {"items": [
             {"id": "broken", "name": "Invalid"},
-            *[{"id": index, "name": f"Game {index}"} for index in range(10, 15)],
+            {"id": 10, "name": "Unavailable type"},
+            {"id": 11, "name": "Game Eleven"},
+            {"id": 12, "name": "DLC Twelve"},
         ]}
-        with patch.object(self.client, "store_get", return_value=payload):
+        detail_responses = [
+            {"10": {"success": False}},
+            {"11": {"success": True, "data": {"type": "game", "name": "Game Eleven"}}},
+            {"12": {"success": True, "data": {"type": "dlc", "name": "DLC Twelve"}}},
+        ]
+        with patch.object(self.client, "store_get", side_effect=[search_payload, *detail_responses]):
             results = self.client.search_store_games("Example")
-        self.assertEqual([item["appid"] for item in results], [10, 11, 12])
+        self.assertEqual([item["appid"] for item in results], [11])
 
     def test_search_requires_two_characters(self):
         with self.assertRaises(ValueError):

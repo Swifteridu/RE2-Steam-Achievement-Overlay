@@ -36,6 +36,7 @@
 - 🏆 **Live achievement tracking** – Retrieves the selected game's achievement definitions and your unlock status from Steam.
 - 📊 **Completion counter** – Shows unlocked achievements, total achievements and completion percentage.
 - 🔍 **Achievement filters** – Separate unlocked and locked achievements.
+- 📌 **Pinned objectives** – Pin up to three achievements and switch between a focused pinned view and the complete achievement list. Pins are saved locally per Steam account and game.
 - 🖼️ **Achievement details** – Shows Steam achievement icons, names and descriptions.
 - 🔔 **Unlock notifications** – Notifies viewers when new achievements are detected. Multiple unlocks between polls are queued individually.
 - 🔄 **Automatic synchronization** – Checks player progress every 30 seconds while Steam is responding.
@@ -60,7 +61,7 @@ Backend responsibilities are split into focused modules instead of being concent
 
 ## 🎯 Game compatibility
 
-Choose from Steam games in the setup page. The selected Steam AppID determines which achievement definitions and player progress the helper retrieves. Search displays a maximum of **three results** at a time; enter an AppID or Store URL manually when your game is not among them.
+Choose from Steam games in the setup page. The selected Steam AppID determines which achievement definitions and player progress the helper retrieves. Search displays a maximum of **three full-game results** at a time. DLC, demos, soundtracks, software and other non-game Store item types are filtered out using Steam AppDetails metadata. Enter an AppID or Store URL manually when your game is not among the search results.
 
 **Important limitation:** it is not technically possible to guarantee support for literally every Steam game. A title must publish an achievement schema and player achievement data through Steamworks. Some games have no Steam achievements, do not expose the required schema, or do not make player stats available. Those titles cannot be tracked by this overlay through the Steam Web API.
 
@@ -134,13 +135,17 @@ The configuration file is stored as ordinary local JSON, not encrypted. Anyone w
 
    | Setting | Value |
    |---|---:|
-   | Width | 440 |
-   | Height | 820 |
+   | Width | 560 |
+   | Height | 900 |
 
 5. Leave **Shutdown source when not visible** unchecked if you want it ready whenever you show it.
-6. Position and resize the source to fit your stream layout.
+6. Position and resize the source to fit your stream layout. Avoid shrinking it too far; the overlay now uses larger text and achievement cards to remain readable at typical streaming sizes.
 
 The area outside the panel is transparent. Keep the command window running while streaming; it hosts the overlay and synchronizes your Steam data. Close it to stop the helper.
+
+### Pinning achievements
+
+In the overlay, use **All Achievements** to keep browsing the full unlocked/locked list. Select the star beside any achievement to pin it; up to three can be pinned per Steam account and game. The **Pinned** view shows only those selected objectives as larger cards. Pins are stored in the OBS browser's local storage on your PC and do not change your Steam achievements.
 
 ## 🔄 Synchronization
 
@@ -239,7 +244,7 @@ The tests use mocked Steam responses. No Steam API key or internet connection is
 
 This project uses the Steam Web API provided by **Valve Corporation** and Steam Store search to locate games. Game achievement definitions, icons and related metadata are retrieved from Steam.
 
-All game names, trademarks, artwork and other game assets belong to their respective rights holders. This is an unofficial community project and is not affiliated with, endorsed by, or sponsored by Valve Corporation, Capcom, or any game developer or publisher.
+All game names, trademarks, artwork and other game assets belong to their respective rights holders. This is an unofficial community project and is not affiliated with, endorsed by, or sponsored by Valve Corporation or any game developer or publisher.
 
 The project code is distributed under the [MIT License](LICENSE).
 

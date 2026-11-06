@@ -43,7 +43,7 @@ def create_handler(service: AchievementService, static_dir: Path = STATIC_DIR):
     """Create an HTTP handler bound to a specific service instance."""
 
     class OverlayRequestHandler(BaseHTTPRequestHandler):
-        server_version = "SteamAchievementOverlay/1.3"
+        server_version = "SteamAchievementOverlay/1.4.0"
         sys_version = ""
 
         def log_request(self, code="-", size="-") -> None:

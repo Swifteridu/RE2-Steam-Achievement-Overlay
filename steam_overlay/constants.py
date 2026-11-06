@@ -12,8 +12,8 @@ CACHE_DIR = ROOT_DIR / "cache"
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("STEAM_OVERLAY_PORT", "8765"))
 
-# Used only when importing the original v1.1 Resident Evil 2 config, which did
-# not store an AppID. New installations must explicitly choose a Steam game.
+# Used only to migrate the original v1.1 single-game config, which did not
+# store an AppID. New installations must explicitly choose a Steam game.
 LEGACY_V11_APP_ID = 883710
 LEGACY_V11_GAME_NAME = "Resident Evil 2"
 

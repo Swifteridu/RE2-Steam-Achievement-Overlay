@@ -29,7 +29,7 @@ class SteamClient:
         self.opener = opener
         self._schema_memory: dict[int, dict] = {}
 
-    def _read_url(self, url: str, *, user_agent: str = "Swifteridu-Steam-Achievement-Overlay/1.3") -> dict:
+    def _read_url(self, url: str, *, user_agent: str = "Swifteridu-Steam-Achievement-Overlay/1.4.0") -> dict:
         request = Request(url, headers={"User-Agent": user_agent, "Accept": "application/json"})
         try:
             with self.opener(request, timeout=15) as response:
@@ -108,28 +108,67 @@ class SteamClient:
         return self.resolve_vanity(vanity, api_key)
 
     def search_store_games(self, query: str) -> list[dict]:
+        """Search the Steam Store and return up to three full games only.
+
+        Steam's lightweight store-search endpoint can return DLC and other app
+        types alongside base games. Verify each candidate with appdetails and
+        accept only entries whose Store metadata explicitly reports type=game.
+        Unknown or unavailable types are skipped rather than treated as games.
+        """
         term = str(query).strip()
         if len(term) < 2:
             raise ValueError("Enter at least two characters to search for a game.")
         if len(term) > 80:
             raise ValueError("The game search is limited to 80 characters.")
-        payload = self.store_get("api/storesearch/", {"term": term, "l": "english", "cc": "US"})
+
+        payload = self.store_get("api/storesearch/", {
+            "term": term, "l": "english", "cc": "US",
+        })
         items = payload.get("items", [])
         if not isinstance(items, list):
             raise RuntimeError("Steam returned an unexpected game search response.")
 
-        results = []
+        candidates = []
+        seen_appids: set[int] = set()
         for item in items:
             if not isinstance(item, dict) or not item.get("id") or not item.get("name"):
+                continue
+            # Store search can include package results (type=sub); these are not
+            # individual game AppIDs and should never be selectable here.
+            if item.get("type") not in (None, "app"):
                 continue
             try:
                 appid = validate_app_id(item["id"])
             except ValueError:
                 continue
+            if appid in seen_appids:
+                continue
+            seen_appids.add(appid)
+            candidates.append((appid, item))
+
+        if not candidates:
+            return []
+
+        # AppDetails exposes the actual Store item type (game, dlc, demo,
+        # music, software, etc.). Verify candidates individually: Steam's
+        # public appdetails endpoint has inconsistent multi-AppID behavior.
+        # Only an explicit type="game" is selectable; unknown types are skipped.
+        results = []
+        for appid, item in candidates:
+            detail_payload = self.store_get("api/appdetails/", {
+                "appids": appid,
+                "l": "english",
+                "cc": "US",
+                "filters": "basic",
+            })
+            entry = detail_payload.get(str(appid), {})
+            details = entry.get("data") if isinstance(entry, dict) and entry.get("success") else None
+            if not isinstance(details, dict) or str(details.get("type", "")).casefold() != "game":
+                continue
             results.append({
                 "appid": appid,
-                "name": str(item["name"])[:120],
-                "image": str(item.get("tiny_image") or ""),
+                "name": str(details.get("name") or item["name"])[:120],
+                "image": str(item.get("tiny_image") or details.get("header_image") or ""),
             })
             if len(results) >= MAX_GAME_SEARCH_RESULTS:
                 break
