@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RE2 Achievement Overlay</title>
+<style>
+:root{color-scheme:dark;--red:#c52b31;--red-dark:#731d22;--text:#eeeae2;--muted:#a0a5a4;--green:#9dc8a9;--panel:rgba(13,16,17,.96);--line:rgba(209,216,211,.17)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;color:var(--text);font-family:"Segoe UI",Arial,sans-serif}
+#shell{width:100%;height:100%;padding:5px}.board{height:100%;display:flex;flex-direction:column;background:linear-gradient(145deg,rgba(28,33,34,.97),rgba(8,11,12,.97) 62%);border:1px solid rgba(205,211,205,.28);border-top:3px solid var(--red);box-shadow:0 12px 45px #0009;overflow:hidden;position:relative}
+.board:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.11;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff 4px,transparent 5px);mix-blend-mode:soft-light}
+.header{padding:15px 17px 12px;border-bottom:1px solid var(--line);position:relative;z-index:1}.eyebrow{font-size:9px;letter-spacing:.24em;color:#db656a;font-weight:800;text-transform:uppercase}.heading{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-top:5px}.game-title{font-size:21px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;line-height:1.1}.edition{font-size:9px;letter-spacing:.16em;color:#aab0ad;border:1px solid #596064;padding:4px 6px;white-space:nowrap}.progress-line{display:flex;justify-content:space-between;align-items:baseline;margin-top:15px}.progress-number{font-size:31px;line-height:1;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums}.progress-number span{font-size:15px;color:#a7acab;font-weight:600}.percent{font-size:12px;letter-spacing:.1em;color:#e6ded5;font-weight:700}.bar{height:5px;background:#3c4142;margin-top:9px;overflow:hidden}.bar-fill{height:100%;width:0;background:linear-gradient(90deg,#7d1d24,#e24a50);transition:width .45s ease}.meta{display:flex;justify-content:space-between;margin-top:7px;color:#8e9695;font-size:9px;letter-spacing:.13em;text-transform:uppercase}
+.controls{display:flex;gap:5px;padding:10px 12px;border-bottom:1px solid var(--line);position:relative;z-index:1}.filter{background:#111617;border:1px solid #3c4446;color:#9fa6a4;padding:7px 9px;font-size:9px;letter-spacing:.1em;font-weight:800;cursor:pointer;flex:1}.filter.active{background:#6f1c21;border-color:#b33b41;color:#fff}.list-wrap{position:relative;z-index:1;overflow:auto;flex:1;scrollbar-width:thin;scrollbar-color:#5b3235 #151a1b;padding:8px 10px 12px}.group-label{font-size:9px;font-weight:900;letter-spacing:.2em;color:#d66b70;text-transform:uppercase;padding:9px 4px 7px;display:flex;justify-content:space-between}.group-label.locked{color:#929a98}.achievement{display:flex;align-items:center;gap:10px;min-height:57px;margin:0 0 6px;padding:7px 9px;background:linear-gradient(90deg,rgba(43,49,49,.8),rgba(23,28,29,.76));border:1px solid rgba(193,201,194,.12);position:relative}.achievement.unlocked{border-left:2px solid #9ebba5}.achievement.locked{opacity:.66;border-left:2px solid #666}.achievement img{width:35px;height:35px;object-fit:contain;flex:0 0 35px;filter:grayscale(1);opacity:.58}.achievement.unlocked img{filter:none;opacity:1}.ach-copy{min-width:0;flex:1}.ach-name{font-size:11px;line-height:1.2;font-weight:800;color:#e9e8e1;letter-spacing:.015em}.ach-desc{font-size:9px;line-height:1.3;color:#9fa5a2;margin-top:3px;white-space:normal}.state{font-size:7px;letter-spacing:.09em;font-weight:900;padding:4px 5px;border:1px solid #57605f;color:#9ea6a3;white-space:nowrap}.unlocked .state{color:#b9d4be;border-color:#52745b;background:#17231b}.empty{color:#a3a9a7;font-size:11px;padding:25px 8px;text-align:center;line-height:1.6}.footer{padding:8px 12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.14em;color:#858d8c;position:relative;z-index:1}.live{display:flex;align-items:center;gap:6px}.dot{width:6px;height:6px;border-radius:50%;background:#8bb79a;box-shadow:0 0 7px #8bb79a}.dot.off{background:#c45a5e;box-shadow:0 0 7px #c45a5e}.toast{position:absolute;z-index:5;top:10px;left:10px;right:10px;display:flex;align-items:center;gap:10px;padding:11px;background:linear-gradient(100deg,#51181c,#1a1d1e);border:1px solid #d15a60;box-shadow:0 8px 25px #000b;transform:translateY(-150%);opacity:0;transition:transform .35s ease,opacity .35s ease}.toast.show{transform:translateY(0);opacity:1}.toast img{width:38px;height:38px;object-fit:contain}.toast-kicker{font-size:8px;letter-spacing:.18em;color:#f18a8e;font-weight:900}.toast-name{font-size:12px;font-weight:900;margin-top:2px}.error{font-size:10px;color:#e4a4a6;text-align:center;padding:18px;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="shell">
+  <section class="board">
+    <div class="toast" id="toast"><img id="toastIcon" alt=""><div><div class="toast-kicker">ACHIEVEMENT UNLOCKED</div><div class="toast-name" id="toastName"></div></div></div>
+    <header class="header">
+      <div class="eyebrow">Raccoon City · Achievement record</div>
+      <div class="heading"><div class="game-title">Resident Evil 2</div><div class="edition">2019 · STEAM</div></div>
+      <div class="progress-line"><div class="progress-number" id="count">-- <span>/ --</span></div><div class="percent" id="percent">--%</div></div>
+      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+      <div class="meta"><span>Completion status</span><span id="remaining">Waiting for Steam…</span></div>
+    </header>
+    <nav class="controls" aria-label="Achievement filters">
+      <button class="filter active" data-filter="all">ALL <span id="allCount">44</span></button>
+      <button class="filter" data-filter="unlocked">UNLOCKED <span id="unlockedCount">0</span></button>
+      <button class="filter" data-filter="locked">LOCKED <span id="lockedCount">44</span></button>
+    </nav>
+    <main class="list-wrap" id="list"><div class="empty">CONNECT STEAM TO LOAD YOUR ACHIEVEMENT RECORD.</div></main>
+    <footer class="footer"><div class="live"><span class="dot off" id="connectionDot"></span><span id="connectionText">WAITING FOR LOCAL HELPER</span></div><span id="updated">AUTO-SYNC · 30 SEC</span></footer>
+  </section>
+</div>
+<script>
+const listEl=document.getElementById('list');let currentFilter='all';let firstLoad=true;let seenEvent=null;let toastTimer=null;let lastRenderKey='';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(data){
+ const total=Number(data.total||44),unlocked=Number(data.unlocked||0),locked=Math.max(0,total-unlocked),pct=total?Math.round(unlocked/total*100):0;
+ document.getElementById('count').innerHTML=`${unlocked} <span>/ ${total}</span>`;
+ document.getElementById('percent').textContent=`${pct}%`;
+ document.getElementById('barFill').style.width=`${pct}%`;
+ document.getElementById('remaining').textContent=`${locked} REMAINING`;
+ document.getElementById('allCount').textContent=total;
+ document.getElementById('unlockedCount').textContent=unlocked;
+ document.getElementById('lockedCount').textContent=locked;
+ const dot=document.getElementById('connectionDot');dot.classList.toggle('off',!data.connected);
+ document.getElementById('connectionText').textContent=data.status==='stale'?'STEAM DATA STALE':(data.connected?'STEAM CONNECTED':(data.status==='setup_required'?'SETUP REQUIRED':'STEAM CONNECTION ISSUE'));
+ document.getElementById('updated').textContent=data.last_updated?`SYNCED ${new Date(data.last_updated).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'AUTO-SYNC · 30 SEC';
+ if(!data.connected){listEl.innerHTML=`<div class="error">${esc(data.error||'Steam is not connected. Open the setup page on your PC.')}</div>`;return;}
+ const achievements=Array.isArray(data.achievements)?data.achievements:[];
+ const visible=achievements.filter(a=>currentFilter==='all'||(currentFilter==='unlocked'?a.unlocked:!a.unlocked));
+ const unlockedItems=visible.filter(a=>a.unlocked),lockedItems=visible.filter(a=>!a.unlocked);
+ const itemHtml=a=>`<article class="achievement ${a.unlocked?'unlocked':'locked'}"><img src="${esc(a.unlocked?(a.icon||a.icon_gray):(a.icon_gray||a.icon))}" alt="" onerror="this.style.visibility='hidden'"><div class="ach-copy"><div class="ach-name">${esc(a.name)}</div><div class="ach-desc">${esc(a.description||'Hidden achievement')}</div></div><span class="state">${a.unlocked?'UNLOCKED':'LOCKED'}</span></article>`;
+ let html='';
+ if(unlockedItems.length){html+=`<div class="group-label">UNLOCKED <span>${unlockedItems.length}</span></div>`+unlockedItems.map(itemHtml).join('');}
+ if(lockedItems.length){html+=`<div class="group-label locked">STILL TO OBTAIN <span>${lockedItems.length}</span></div>`+lockedItems.map(itemHtml).join('');}
+ listEl.innerHTML=html||'<div class="empty">No achievements in this filter.</div>';
+ const event=data.new_unlock;
+ if(event&&event.id&&event.id!==seenEvent){
+   if(firstLoad){seenEvent=event.id;}else{showToast(event);seenEvent=event.id;}
+ }
+ firstLoad=false;
+}
+function showToast(event){const toast=document.getElementById('toast');document.getElementById('toastName').textContent=event.name||'Achievement unlocked';const icon=document.getElementById('toastIcon');icon.src=event.icon||'';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),6500);}
+document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{currentFilter=btn.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));fetchData();}));
+async function fetchData(){try{const response=await fetch('/api/achievements',{cache:'no-store'});const data=await response.json();render(data);}catch(err){document.getElementById('connectionText').textContent='LOCAL HELPER OFFLINE';document.getElementById('connectionDot').classList.add('off');}}
+fetchData();setInterval(fetchData,3000);
+</script>
+</body>
+</html>

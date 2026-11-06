@@ -1,0 +1,13 @@
+# Local Steam credentials and runtime files
+config.json
+config.tmp
+*.tmp
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Development environments / test caches
+.venv/
+venv/
+.pytest_cache/
