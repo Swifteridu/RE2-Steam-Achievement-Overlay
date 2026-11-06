@@ -1,13 +1,13 @@
-# 🧟 Resident Evil 2 — Steam Achievement Overlay
+# 🎮 Steam Achievement Overlay
 
 <p align="center">
-  <strong>A real-time Steam achievement tracker for Resident Evil 2 (2019), built for OBS.</strong>
+  <strong>A real-time Steam achievement tracker for OBS Studio.</strong>
   <br>
-  Track your journey towards 100% completion and let your viewers follow every achievement as you unlock it.
+  Choose a Steam game, connect your profile and let your viewers follow your progress towards 100% completion.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue?style=for-the-badge" alt="Windows">
+  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue?style=for-the-badge" alt="Windows 10 and 11">
   <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/OBS-Browser%20Source-purple?style=for-the-badge&logo=obsstudio&logoColor=white" alt="OBS Browser Source">
   <img src="https://img.shields.io/badge/Dependencies-None-success?style=for-the-badge" alt="No external dependencies">
@@ -15,240 +15,217 @@
 
 ---
 
-## 📖 Table of Contents
+## 📖 Contents
 
 - [✨ Features](#-features)
+- [🎯 Game compatibility](#-game-compatibility)
 - [📋 Requirements](#-requirements)
-- [🚀 Getting Started](#-getting-started)
-  - [1. Installation](#1-installation)
-  - [2. Connect Steam](#2-connect-steam)
-  - [3. Add to OBS](#3-add-to-obs)
+- [🚀 Getting started](#-getting-started)
 - [🔄 Synchronization](#-synchronization)
-- [🔌 Steam API Integration](#-steam-api-integration)
-- [🔒 Security & Privacy](#-security--privacy)
+- [🔌 Steam API integration](#-steam-api-integration)
+- [🔒 Security and privacy](#-security-and-privacy)
 - [🛠️ Troubleshooting](#️-troubleshooting)
-- [🧪 Running Tests](#-running-tests)
-- [❤️ Credits & Disclaimer](#️-credits--disclaimer)
+- [🧪 Running tests](#-running-tests)
+- [❤️ Credits and disclaimer](#️-credits-and-disclaimer)
 
 ---
 
 ## ✨ Features
 
-Everything you need to bring your Resident Evil 2 achievement hunt to your stream.
+- 🕹️ **Choose your game** – Search the Steam Store or enter a Steam AppID / Store URL.
+- 🏆 **Live achievement tracking** – Retrieves the selected game's achievement definitions and your unlock status from Steam.
+- 📊 **Completion counter** – Shows unlocked achievements, total achievements and completion percentage.
+- 🔍 **Achievement filters** – Separate unlocked and locked achievements.
+- 🖼️ **Achievement details** – Shows Steam achievement icons, names and descriptions.
+- 🔔 **Unlock notifications** – Notifies viewers when new achievements are detected. Multiple unlocks between polls are queued individually.
+- 🔄 **Automatic synchronization** – Checks player progress every 30 seconds while Steam is responding.
+- 💾 **Persistent schema caching** – Caches each game's achievement definitions on disk for up to six hours.
+- 🛡️ **Offline handling** – Keeps the last successful achievement list visible during temporary Steam outages and marks it as stale.
+- ⚡ **Automatic recovery** – Uses retry backoff when Steam is unavailable.
+- 🎥 **OBS integration** – Runs as a transparent OBS Browser Source.
+- 🐍 **No extra Python packages** – Uses only Python's standard library; no `pip install` step is required.
 
-- 🏆 **Live Achievement Tracking** – Automatically retrieves your Steam achievements and unlock status.
-- 📊 **Completion Counter** – Displays your overall achievement progress.
-- 🔍 **Achievement Filters** – Easily distinguish between unlocked and locked achievements.
-- 🖼️ **Achievement Details** – Displays icons, names and descriptions.
-- 🔔 **Unlock Notifications** – Notifies your viewers whenever you unlock a new achievement.
-- 🔄 **Automatic Synchronization** – Checks for newly unlocked achievements every 30 seconds.
-- 💾 **Smart Caching** – Caches achievement definitions for up to six hours to reduce unnecessary API requests.
-- 🛡️ **Reliable Offline Handling** – Preserves your last successful achievement data during temporary Steam outages.
-- ⚡ **Automatic Recovery** – Uses retry backoff when Steam is unavailable.
-- 🎮 **OBS Integration** – Designed to work as a transparent OBS Browser Source.
+### Project structure
 
-**No unnecessary dependencies.** The backend uses only Python's standard library. No `pip install` required.
+Backend responsibilities are split into focused modules instead of being concentrated in one file:
 
----
+| Module | Responsibility |
+|---|---|
+| `steam_overlay/config.py` | Local configuration, validation and legacy migration |
+| `steam_overlay/steam_client.py` | Steam API requests, game search and schema caching |
+| `steam_overlay/service.py` | Achievement synchronization, state and unlock notifications |
+| `steam_overlay/http_server.py` | Local HTTP routes and request security |
+| `steam_overlay/app.py` | Application startup and shutdown |
+| `server.py` | Small launcher entry point |
+
+## 🎯 Game compatibility
+
+Choose from Steam games in the setup page. The selected Steam AppID determines which achievement definitions and player progress the helper retrieves. Search displays a maximum of **three results** at a time; enter an AppID or Store URL manually when your game is not among them.
+
+**Important limitation:** it is not technically possible to guarantee support for literally every Steam game. A title must publish an achievement schema and player achievement data through Steamworks. Some games have no Steam achievements, do not expose the required schema, or do not make player stats available. Those titles cannot be tracked by this overlay through the Steam Web API.
+
+Game search is limited to three results per query to keep selection quick and uncluttered. This project currently supports:
+
+- Steam games that expose achievement definitions through `ISteamUserStats/GetSchemaForGame`.
+- Player accounts whose game details and achievement data are accessible through Steam's API.
+- One selected game at a time. You can switch games from the setup page.
+
+It does **not** currently track achievements from Epic Games, GOG, PlayStation, Xbox, non-Steam games, or platform-specific achievement systems outside Steam.
+
+### How to select a game
+
+1. Search by the game's name in the setup page and select one of the up to three results; or
+2. Enter its numeric Steam AppID; or
+3. Paste its Steam Store URL, for example `https://store.steampowered.com/app/620/Portal_2/`.
+
+The helper checks whether Steam returns an achievement schema when you connect. A game appearing in the Store search results does not automatically mean its achievements are accessible through the API.
 
 ## 📋 Requirements
 
-Before getting started, make sure you have:
-
 | Requirement | Details |
 |---|---|
-| Operating System | Windows 10 or Windows 11 |
+| Operating system | Windows 10 or Windows 11 |
 | Python | Version 3.10 or newer |
-| Game | Resident Evil 2 (2019) on Steam |
+| Game | A Steam game with achievement data accessible through Steamworks |
 | Steam API | A Steam Web API key |
-| Steam Account | Your Steam profile URL or SteamID64 |
-| Streaming Software | OBS Studio with Browser Source support |
+| Steam account | Steam profile URL or SteamID64 |
+| Streaming software | OBS Studio with Browser Source support |
 
----
-
-## 🚀 Getting Started
+## 🚀 Getting started
 
 ### 1. Installation
 
-1. Download the latest project ZIP from the [GitHub Releases](../../releases) page, or download the repository.
-2. Extract the ZIP into a permanent folder.
-
-   Example:
-
-   `C:\RE2AchievementOverlay\`
-
+1. Download the latest `Steam_Achievement_Overlay` ZIP from the [Releases page](../../releases).
+2. Extract the ZIP into a permanent folder, for example `C:\SteamAchievementOverlay\`.
 3. Double-click `start_overlay.bat`.
-4. Your browser should open the local setup page:
+4. Your browser should open the local setup page at **http://127.0.0.1:8765/**.
 
-   **http://127.0.0.1:8765/**
-
-> **Windows Security Notice**
+> **Windows security notice**
 >
-> Windows may display an "Unknown Publisher" warning when launching `start_overlay.bat`. This is expected because the batch file is not digitally signed. It is not a malware detection.
->
-> You can inspect the source code in this repository before running it.
+> Windows may display an "Unknown Publisher" warning when launching `start_overlay.bat`. The batch file is not digitally signed, so Windows cannot verify a publisher. This warning is not itself a malware detection. Review the source code before running software downloaded from the internet.
 
-### 2. Connect Steam
+### 2. Select a game and connect Steam
 
-1. Visit the [Steam Web API Key registration page](https://steamcommunity.com/dev/apikey/).
-2. Sign in with your Steam account.
-3. Register for a Web API key.
-4. Copy your API key.
-5. Return to the overlay setup page.
-6. Enter your Steam API key and Steam profile URL (or SteamID64).
-7. Click **Connect Steam**.
+1. On the setup page, search for your game and select it from the results. Alternatively, enter its Steam AppID or Steam Store URL.
+2. Create a Steam Web API key at the [Steam Web API Key page](https://steamcommunity.com/dev/apikey/).
+3. Enter your API key and Steam profile URL (or SteamID64).
+4. Click **Connect Steam & Load Achievements**.
+5. The helper verifies that the selected game exposes achievement data and then loads your progress.
 
-**Important:** Your Steam profile and **Game Details** privacy settings must be set to **Public** if Steam cannot return your achievements.
+Your Steam profile and **Game Details** privacy settings should be **Public** if Steam cannot return your achievement data. Some games still won't work even with public privacy settings if the developer does not expose the required stats.
 
-Your API key is saved locally in `config.json`. The helper uses it to communicate with Steam. It is never sent to the OBS overlay page or displayed to viewers.
+The API key is saved locally in `config.json`. It is used by the local helper to communicate with Steam; it is never sent to the OBS overlay page or displayed to viewers. Do not publish, share or commit `config.json`. The repository's `.gitignore` excludes it by default.
 
-Never publish, share or commit `config.json`. The repository's `.gitignore` excludes it by default.
+The configuration file is stored as ordinary local JSON, not encrypted. Anyone with access to your Windows account or files may be able to read it. Use the overlay only on a trusted PC and keep your Windows account protected.
 
-The configuration file is stored as ordinary local JSON, not encrypted. Anyone with access to your Windows account or files may be able to read it. Keep your Windows account protected and use the overlay only on a trusted PC.
+**Existing v1.1 configuration:** if you are upgrading from the original release, copy your old `config.json` into the new project folder. The helper recognizes that legacy configuration and migrates its original game selection (its previously hard-coded AppID) automatically. You can then choose another Steam game from the setup page. Never upload the config file to GitHub.
 
-### 3. Add to OBS
+### 3. Add the overlay to OBS
 
 1. Open OBS Studio.
-2. Add a new **Browser Source**.
-3. Set its URL to:
+2. Add a **Browser Source**.
+3. Set the URL to:
 
    ```text
    http://127.0.0.1:8765/overlay
    ```
 
-4. Use the following dimensions as a starting point:
+4. Start with these dimensions:
 
    | Setting | Value |
-   |---|---|
+   |---|---:|
    | Width | 440 |
    | Height | 820 |
 
-5. Leave **Shutdown source when not visible** unchecked if you want the overlay ready whenever you show it.
+5. Leave **Shutdown source when not visible** unchecked if you want it ready whenever you show it.
 6. Position and resize the source to fit your stream layout.
 
-The overlay background is transparent, allowing you to position it over your gameplay without covering the entire scene.
-
-> **Keep the helper running!**
->
-> The command window must remain open while streaming. It handles Steam synchronization and serves the overlay locally.
->
-> Closing the command window stops the helper.
-
----
+The area outside the panel is transparent. Keep the command window running while streaming; it hosts the overlay and synchronizes your Steam data. Close it to stop the helper.
 
 ## 🔄 Synchronization
 
-The overlay automatically synchronizes your achievement progress with Steam.
-
 | Behavior | Details |
 |---|---|
-| Achievement schema | Cached for up to 6 hours |
-| Achievement polling | Every 30 seconds |
+| Achievement schema cache | Per-game cache, up to 6 hours |
+| Player achievement polling | Every 30 seconds while Steam responds |
 | Retry behavior | Exponential backoff, up to 5 minutes |
-| Steam outages | Last successful achievement list is preserved |
-| Stale data | Overlay indicates when displayed data is outdated |
+| Steam outages | Last successful achievement list is preserved and marked stale |
 | First connection | Existing achievements are treated as the initial baseline |
+| Multiple unlocks | Each newly detected achievement is queued for its own notification |
+| Game/account switch | New selection becomes a baseline; old unlocks do not trigger false notifications |
 
-**How unlock notifications work:**
+The achievement schema cache is stored in the local `cache/` directory. It contains public game achievement definitions, not your Steam API key. It is excluded from Git by `.gitignore`.
 
-When connecting for the first time, your existing achievements are registered as your baseline. This prevents the overlay from triggering notifications for achievements you unlocked before starting the stream.
+## 🔌 Steam API integration
 
-After the initial synchronization, newly detected achievements trigger notifications for your viewers.
+The helper uses these Steam Web API methods:
 
----
-
-## 🔌 Steam API Integration
-
-The project uses the official Steam Web API to retrieve achievement information.
-
-The following API methods are used:
-
-| API Method | Purpose |
+| API method | Purpose |
 |---|---|
 | `ISteamUser/ResolveVanityURL` | Resolves custom Steam profile URLs |
-| `ISteamUserStats/GetSchemaForGame` | Retrieves achievement names, descriptions and icons |
-| `ISteamUserStats/GetPlayerAchievements` | Retrieves the player's achievement unlock status |
+| `ISteamUserStats/GetSchemaForGame` | Retrieves the selected game's achievement names, descriptions and icons |
+| `ISteamUserStats/GetPlayerAchievements` | Retrieves the selected account's achievement unlock state for that AppID |
 
-For further information, see the official [Steamworks ISteamUserStats documentation](https://partner.steamgames.com/doc/webapi/ISteamUserStats).
+Game-name search uses Steam Store's search endpoint. This Store search endpoint is an undocumented convenience interface and may change; if search is unavailable, enter the AppID or Store URL manually. The search service is separate from the achievement API; final compatibility is checked using the selected game's Steamworks achievement schema and player stats.
 
----
+See the official [Steamworks ISteamUserStats documentation](https://partner.steamgames.com/doc/webapi/ISteamUserStats).
 
-## 🔒 Security & Privacy
+## 🔒 Security and privacy
 
-Security matters, especially when distributing software to other people.
+- **Localhost only:** the helper binds to `127.0.0.1`; it is not exposed to your LAN or the public internet.
+- **Request validation:** setup and manual-refresh POST requests require the expected local Host and Origin.
+- **Input validation:** API key formats, SteamID64 values, AppIDs and Steam Community / Steam Store URL hosts are validated.
+- **Private responses:** responses containing account data use `Cache-Control: no-store`.
+- **Safe logging:** request logs omit query strings and request bodies, so credentials are not written to the console log.
+- **Local credentials:** the Steam API key is stored in `config.json` as plaintext. Keep that file private and out of GitHub.
 
-The project includes the following protections:
-
-- **Localhost Only:** The helper binds to `127.0.0.1`. It is not exposed to your LAN or the public internet.
-- **Request Validation:** Setup and manual-refresh POST requests require the expected local Host and Origin, helping prevent cross-origin websites from modifying the saved Steam account.
-- **Input Validation:** Steam API key formats, SteamID64 values and Steam Community profile hosts are validated.
-- **Private Responses:** Responses containing account information use `Cache-Control: no-store`.
-- **Safe Logging:** Request logs omit query strings and request bodies, preventing credentials from being written to console logs.
-- **Local Credentials:** The Steam API key stays in `config.json` and is never exposed to the OBS overlay page.
-
-### Protecting Your Steam API Key
-
-Your Steam API key is stored in plaintext in `config.json`.
-
-- Never upload `config.json` to GitHub.
-- Never share your API key publicly.
-- Keep your Windows account protected.
-- Revoke your API key at the [Steam Web API Key page](https://steamcommunity.com/dev/apikey/) if it is accidentally exposed.
-
----
+If you accidentally expose your API key, revoke it through the [Steam Web API Key page](https://steamcommunity.com/dev/apikey/) and create a replacement. See [SECURITY.md](SECURITY.md) for vulnerability-reporting guidance.
 
 ## 🛠️ Troubleshooting
 
 <details>
-<summary><strong>Could not resolve Steam profile</strong></summary>
+<summary><strong>Steam search cannot find my game</strong></summary>
 
-Make sure you provide either your full Steam Community profile URL:
-
-`https://steamcommunity.com/id/yourusername/`
-
-Or your 17-digit SteamID64.
+Try entering the numeric AppID from the Steam Store URL instead. For example, in `https://store.steampowered.com/app/620/Portal_2/`, the AppID is `620`.
 
 </details>
 
 <details>
-<summary><strong>Could not read achievements</strong></summary>
+<summary><strong>Steam says the game does not expose an achievement schema</strong></summary>
 
-Make sure your Steam profile and Game Details privacy settings are set to **Public**.
-
-</details>
-
-<details>
-<summary><strong>Overlay says local helper offline</strong></summary>
-
-Make sure `start_overlay.bat` is running and that its command window remains open.
+The game may not have Steam achievements, or its developer may not publish the achievement schema through Steamworks. This cannot be fixed by changing your privacy settings. Try another game that exposes its achievement data.
 
 </details>
 
 <details>
-<summary><strong>Overlay says Steam data is stale</strong></summary>
+<summary><strong>Could not read my achievements</strong></summary>
 
-Steam could not be reached during the last synchronization attempt.
+Set your Steam profile and **Game Details** privacy settings to **Public**. Also check that you own or have access to the selected game and that Steam can return its player stats.
 
-Your last successful achievement list remains visible. The helper automatically retries when Steam becomes available again.
+</details>
+
+<details>
+<summary><strong>The overlay says local helper offline</strong></summary>
+
+Run `start_overlay.bat` and keep its command window open.
+
+</details>
+
+<details>
+<summary><strong>The overlay says Steam data is stale</strong></summary>
+
+Steam could not be reached during the last synchronization attempt. Your last successful achievement list remains visible, and the helper retries automatically.
 
 </details>
 
 <details>
 <summary><strong>Port 8765 is already in use</strong></summary>
 
-Another application is already using the default port.
-
-Close the conflicting application or set the `RE2_OVERLAY_PORT` environment variable before starting the batch file.
-
-Remember to update the OBS Browser Source URL to use the same port.
+Close the other local service using that port, or set the `STEAM_OVERLAY_PORT` environment variable before starting the batch file. Update the OBS Browser Source URL to use the same port.
 
 </details>
 
----
-
-## 🧪 Running Tests
-
-The project includes automated backend tests to help verify functionality and prevent regressions.
+## 🧪 Running tests
 
 From the project directory, open PowerShell and run:
 
@@ -256,26 +233,22 @@ From the project directory, open PowerShell and run:
 py -3 -m unittest discover -s tests -v
 ```
 
-The tests use mocked Steam API responses.
+The tests use mocked Steam responses. No Steam API key or internet connection is required. GitHub Actions also runs the test suite on pushes and pull requests against Python 3.10–3.14.
 
-**No Steam API key or internet connection is required to run the test suite.**
+## ❤️ Credits and disclaimer
 
----
+This project uses the Steam Web API provided by **Valve Corporation** and Steam Store search to locate games. Game achievement definitions, icons and related metadata are retrieved from Steam.
 
-## ❤️ Credits & Disclaimer
+All game names, trademarks, artwork and other game assets belong to their respective rights holders. This is an unofficial community project and is not affiliated with, endorsed by, or sponsored by Valve Corporation, Capcom, or any game developer or publisher.
 
-This project uses the Steam Web API provided by **Valve Corporation** to retrieve Resident Evil 2 achievement data.
+The project code is distributed under the [MIT License](LICENSE).
 
-**Resident Evil 2**, including its name, trademarks, characters, artwork and other related game assets, belongs to its respective rights holders, including **Capcom**.
-
-This is an unofficial fan-made project. It is not affiliated with, endorsed by, or sponsored by Valve Corporation or Capcom.
-
-Made for achievement hunters and Resident Evil fans. 🧟
+Steam achievement support depends on what each game's developer exposes through Steamworks. This tool does not modify game files or unlock achievements.
 
 ---
 
 <p align="center">
-  <strong>Good luck on your journey to 100% completion!</strong>
+  <strong>Track your games. Share your progress. Go for 100%.</strong>
   <br>
   <sub>Made by <strong>Swifteridu</strong></sub>
 </p>

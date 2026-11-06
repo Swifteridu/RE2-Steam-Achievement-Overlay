@@ -1,7 +1,8 @@
-# Local Steam credentials and runtime files
+# Local Steam credentials and runtime/cache files
 config.json
 config.tmp
 *.tmp
+cache/
 
 # Python generated files
 __pycache__/

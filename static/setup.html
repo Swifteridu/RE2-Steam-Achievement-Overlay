@@ -1,53 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RE2 Achievement Overlay · Setup</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam Achievement Overlay · Setup</title>
 <style>
-:root{color-scheme:dark;--bg:#0b0d0e;--panel:#15191b;--panel2:#1c2224;--line:#343b3e;--red:#c52b31;--red2:#8d1e24;--text:#f0eee8;--muted:#a2a7a6;--green:#8db99c}
+:root{color-scheme:dark;--bg:#0b0d0e;--panel:#15191b;--line:#343b3e;--red:#c52b31;--text:#f0eee8;--muted:#a2a7a6}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#25292a 0,#111516 42%,#090b0c 100%);color:var(--text);font:15px/1.5 "Segoe UI",Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:28px}
-.wrap{width:min(720px,100%)}.eyebrow{font-size:11px;letter-spacing:.22em;color:#d45a5f;text-transform:uppercase;font-weight:700}.title{font-size:30px;line-height:1.12;letter-spacing:.06em;text-transform:uppercase;margin:8px 0 6px}.sub{color:var(--muted);margin:0 0 24px}.card{background:linear-gradient(145deg,rgba(29,34,36,.98),rgba(15,18,19,.98));border:1px solid #41484a;border-top:3px solid var(--red);padding:26px;box-shadow:0 24px 80px #0009}.field{margin:18px 0}.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4d5d0;margin-bottom:7px}.field input{width:100%;background:#090c0d;border:1px solid #3e4649;color:var(--text);padding:13px 14px;border-radius:2px;outline:none;font-size:14px}.field input:focus{border-color:#c64a50;box-shadow:0 0 0 2px #c52b3124}.help{font-size:12px;color:var(--muted);margin-top:7px}.help a{color:#e17b7f;text-decoration:none}.help a:hover{text-decoration:underline}.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:24px}.btn{border:0;background:var(--red);color:white;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:13px 19px;cursor:pointer;border-radius:2px}.btn:hover{background:#e03b42}.btn:disabled{opacity:.55;cursor:wait}.secondary{color:#d6d5ce;font-size:13px;text-decoration:none}.status{display:none;margin-top:18px;border:1px solid var(--line);background:#0c1011;padding:12px 14px;font-size:13px}.status.show{display:block}.status.ok{border-color:#476d55;color:#b3d8bd}.status.err{border-color:#8b3438;color:#f0a4a7}.steps{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}.steps h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px}.steps ol{margin:0;padding-left:20px;color:#c0c3bf;font-size:13px}.steps li{padding:4px 0}.warning{margin-top:17px;color:#d4bcb7;font-size:12px;border-left:2px solid var(--red);padding-left:11px}.foot{font-size:11px;color:#727a7b;text-align:center;margin-top:15px}
-</style>
-</head>
-<body>
-<main class="wrap">
-  <div class="eyebrow">Raccoon City · Stream utility</div>
-  <h1 class="title">Achievement file</h1>
-  <p class="sub">Connect your Steam profile to load your Resident Evil 2 achievement progress.</p>
-  <section class="card">
-    <form id="setupForm">
-      <div class="field">
-        <label for="apiKey">Steam Web API key</label>
-        <input id="apiKey" name="api_key" type="password" autocomplete="off" placeholder="Paste your Steam API key" required>
-        <div class="help">Create one at <a href="https://steamcommunity.com/dev/apikey/" target="_blank" rel="noreferrer">steamcommunity.com/dev/apikey</a>.</div>
-      </div>
-      <div class="field">
-        <label for="profile">Steam profile URL or SteamID64</label>
-        <input id="profile" name="profile" type="text" autocomplete="off" placeholder="https://steamcommunity.com/id/yourname/ or 7656119..." required>
-        <div class="help">A custom profile URL (/id/...) or numeric SteamID64 both work.</div>
-      </div>
-      <div class="actions">
-        <button class="btn" id="connectBtn" type="submit">Connect Steam</button>
-        <a class="secondary" href="/overlay" target="_blank">Open overlay preview ↗</a>
-      </div>
-      <div id="status" class="status" role="status" aria-live="polite"></div>
-    </form>
-    <div class="steps">
-      <h2>Before connecting</h2>
-      <ol>
-        <li>Set your Steam profile to <b>Public</b>.</li>
-        <li>Set <b>Game details</b> to <b>Public</b> in your Steam privacy settings.</li>
-        <li>Create a Web API key and paste it above. Do not send the key to anyone.</li>
-      </ol>
-      <div class="warning">Your API key is saved locally in this overlay folder's <b>config.json</b>. It is not sent to OBS viewers or stored by a third-party service. Do not share the config file.</div>
-    </div>
-  </section>
-  <div class="foot">LOCAL HELPER · RESIDENT EVIL 2 · STEAM APP 883710</div>
-</main>
+.wrap{width:min(760px,100%)}.eyebrow{font-size:11px;letter-spacing:.22em;color:#d45a5f;text-transform:uppercase;font-weight:700}.title{font-size:30px;line-height:1.12;letter-spacing:.06em;text-transform:uppercase;margin:8px 0 6px}.sub{color:var(--muted);margin:0 0 24px}.card{background:linear-gradient(145deg,rgba(29,34,36,.98),rgba(15,18,19,.98));border:1px solid #41484a;border-top:3px solid var(--red);padding:26px;box-shadow:0 24px 80px #0009}.field{margin:18px 0}.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4d5d0;margin-bottom:7px}.field input{width:100%;background:#090c0d;border:1px solid #3e4649;color:var(--text);padding:13px 14px;border-radius:2px;outline:none;font-size:14px}.field input:focus{border-color:#c64a50;box-shadow:0 0 0 2px #c52b3124}.help{font-size:12px;color:var(--muted);margin-top:7px}.help a{color:#e17b7f;text-decoration:none}.help a:hover{text-decoration:underline}.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}.btn{border:0;background:var(--red);color:white;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:11px 16px;cursor:pointer;border-radius:2px}.btn:hover{background:#e03b42}.btn:disabled{opacity:.55;cursor:wait}.secondary{color:#d6d5ce;font-size:13px;text-decoration:none}.status{display:none;margin-top:18px;border:1px solid var(--line);background:#0c1011;padding:12px 14px;font-size:13px}.status.show{display:block}.status.ok{border-color:#476d55;color:#b3d8bd}.status.err{border-color:#8b3438;color:#f0a4a7}.results{display:grid;gap:7px;margin-top:10px}.game-result{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#101516;border:1px solid #394144;color:#eee;padding:8px;cursor:pointer}.game-result:hover,.game-result.selected{border-color:#b94b50;background:#291619}.game-result img{width:92px;height:43px;object-fit:cover;background:#222}.game-result span{font-size:13px;font-weight:700}.selected-game{margin-top:10px;padding:10px 12px;background:#17231b;border:1px solid #476d55;color:#b9d9c1;font-size:13px}.steps{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}.steps h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px}.steps ol{margin:0;padding-left:20px;color:#c0c3bf;font-size:13px}.steps li{padding:4px 0}.warning{margin-top:17px;color:#d4bcb7;font-size:12px;border-left:2px solid var(--red);padding-left:11px}.foot{font-size:11px;color:#727a7b;text-align:center;margin-top:15px}
+</style></head>
+<body><main class="wrap">
+<div class="eyebrow">Steam · Stream utility</div><h1 class="title">Achievement tracker</h1>
+<p class="sub">Choose a Steam game, connect your profile and show your achievement progress in OBS.</p>
+<section class="card"><form id="setupForm">
+<div class="field"><label for="gameSearch">1. Find your Steam game</label><input id="gameSearch" type="search" placeholder="Search Steam games, e.g. Portal 2 or Cyberpunk 2077" autocomplete="off"><div class="actions"><button class="btn" type="button" id="searchBtn">Search Steam</button><span class="help">Up to 3 results are shown.</span></div><div id="results" class="results" aria-live="polite"></div><div id="selectedGame" class="selected-game" hidden></div></div>
+<div class="field"><label for="appid">Or enter a Steam AppID / Store URL</label><input id="appid" name="appid" type="text" placeholder="e.g. 620 or https://store.steampowered.com/app/620/Portal_2/"><div class="help">You can find the AppID in the Steam Store page URL. The game must expose achievements through Steamworks.</div></div>
+<div class="field"><label for="apiKey">2. Steam Web API key</label><input id="apiKey" name="api_key" type="password" autocomplete="off" placeholder="Paste your Steam API key" required><div class="help">Create one at <a href="https://steamcommunity.com/dev/apikey/" target="_blank" rel="noreferrer">steamcommunity.com/dev/apikey</a>.</div></div>
+<div class="field"><label for="profile">3. Steam profile URL or SteamID64</label><input id="profile" name="profile" type="text" autocomplete="off" placeholder="https://steamcommunity.com/id/yourname/ or 7656119..." required></div>
+<div class="actions"><button class="btn" id="connectBtn" type="submit">Connect Steam & Load Achievements</button><a class="secondary" href="/overlay" target="_blank" rel="noreferrer">Open overlay preview ↗</a></div>
+<div id="status" class="status" role="status" aria-live="polite"></div></form>
+<div class="steps"><h2>Before connecting</h2><ol><li>Set your Steam profile and <b>Game details</b> privacy to <b>Public</b>.</li><li>Create a Steam Web API key and paste it above. Never send the key to anyone.</li><li>Select a game with Steam achievements. Some games do not publish achievement data through the Steam API.</li></ol><div class="warning">Your API key is saved locally in <b>config.json</b>. It is not sent to OBS viewers or stored by a third-party service. Do not share the config file.</div></div>
+</section><div class="foot">LOCAL HELPER · STEAM ACHIEVEMENT TRACKER</div></main>
 <script>
-const form=document.getElementById('setupForm');const btn=document.getElementById('connectBtn');const statusBox=document.getElementById('status');
-form.addEventListener('submit',async e=>{e.preventDefault();btn.disabled=true;btn.textContent='CONNECTING…';statusBox.className='status show';statusBox.textContent='Checking your Steam profile and loading achievements…';try{const res=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:document.getElementById('apiKey').value,profile:document.getElementById('profile').value})});const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Could not connect.');statusBox.className='status show ok';statusBox.textContent=data.message+' You can now add the overlay URL to OBS.';document.getElementById('apiKey').value='';}catch(err){statusBox.className='status show err';statusBox.textContent=err.message;}finally{btn.disabled=false;btn.textContent='CONNECT STEAM';}});
-</script>
-</body>
-</html>
+const form=document.getElementById('setupForm'),btn=document.getElementById('connectBtn'),statusBox=document.getElementById('status'),results=document.getElementById('results');
+let chosenGame=null;
+function showStatus(message,type=''){statusBox.className=`status show ${type}`;statusBox.textContent=message;}
+document.getElementById('searchBtn').addEventListener('click',searchGames);
+document.getElementById('gameSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchGames();}});
+async function searchGames(){const q=document.getElementById('gameSearch').value.trim();results.innerHTML='';if(q.length<2){showStatus('Enter at least two characters to search.','err');return;}const searchBtn=document.getElementById('searchBtn');searchBtn.disabled=true;searchBtn.textContent='SEARCHING…';try{const res=await fetch(`/api/games/search?q=${encodeURIComponent(q)}`,{cache:'no-store'});const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Steam game search failed.');if(!data.games.length){showStatus('No Steam Store results found. Try another title or enter the AppID manually.','err');return;}for(const game of data.games.slice(0,3)){const button=document.createElement('button');button.type='button';button.className='game-result';const img=document.createElement('img');img.alt='';img.src=game.image||'';const label=document.createElement('span');label.textContent=`${game.name} · AppID ${game.appid}`;button.append(img,label);button.addEventListener('click',()=>selectGame(game));results.append(button);}showStatus('Showing up to 3 results. Select the correct game; achievement support is checked when you connect.');}catch(err){showStatus(err.message,'err');}finally{searchBtn.disabled=false;searchBtn.textContent='SEARCH STEAM';}}
+function selectGame(game){chosenGame=game;document.getElementById('appid').value=String(game.appid);document.getElementById('selectedGame').hidden=false;document.getElementById('selectedGame').textContent=`Selected: ${game.name} (AppID ${game.appid})`;document.querySelectorAll('.game-result').forEach(b=>b.classList.remove('selected'));const selected=[...document.querySelectorAll('.game-result')].find(b=>b.textContent.includes(`AppID ${game.appid}`));if(selected)selected.classList.add('selected');showStatus('Game selected. Connect your Steam profile to verify achievement support.');}
+form.addEventListener('submit',async e=>{e.preventDefault();btn.disabled=true;btn.textContent='CONNECTING…';showStatus('Checking the selected game and loading your Steam achievements…');try{const res=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:document.getElementById('apiKey').value,profile:document.getElementById('profile').value,appid:document.getElementById('appid').value,game_name:chosenGame&&String(chosenGame.appid)===document.getElementById('appid').value?chosenGame.name:''})});const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Could not connect.');showStatus(data.message+' You can now add the overlay URL to OBS.','ok');document.getElementById('apiKey').value='';}catch(err){showStatus(err.message,'err');}finally{btn.disabled=false;btn.textContent='CONNECT STEAM & LOAD ACHIEVEMENTS';}});
+</script></body></html>
