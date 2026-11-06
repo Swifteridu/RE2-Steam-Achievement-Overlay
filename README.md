@@ -73,7 +73,7 @@ Game search is limited to three results per query to keep selection quick and un
 It does **not** currently track achievements from Epic Games, GOG, PlayStation, Xbox, non-Steam games, or platform-specific achievement systems outside Steam.
 
 ### How to select a game
-
+<img width="1919" height="1079" alt="SteamAchievementSetup" src="https://github.com/user-attachments/assets/26c9443d-cffd-4870-8d35-121b88a756e9" />
 1. Search by the game's name in the setup page and select one of the up to three results; or
 2. Enter its numeric Steam AppID; or
 3. Paste its Steam Store URL, for example `https://store.steampowered.com/app/620/Portal_2/`.
@@ -129,7 +129,7 @@ The configuration file is stored as ordinary local JSON, not encrypted. Anyone w
    ```text
    http://127.0.0.1:8765/overlay
    ```
-
+<img width="1919" height="1079" alt="SteamAchievementOverlay" src="https://github.com/user-attachments/assets/56afa409-9765-4c46-834d-e22d0de10037" />
 4. Start with these dimensions:
 
    | Setting | Value |
