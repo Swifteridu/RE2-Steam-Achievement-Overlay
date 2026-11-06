@@ -11,6 +11,7 @@ CACHE_DIR = ROOT_DIR / "cache"
 
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("STEAM_OVERLAY_PORT", "8765"))
+PINS_PATH = ROOT_DIR / "pins.json"
 
 # Used only to migrate the original v1.1 single-game config, which did not
 # store an AppID. New installations must explicitly choose a Steam game.

@@ -12,3 +12,7 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+
+# Local achievement pin preferences
+pins.json
+pins.json.tmp

@@ -43,7 +43,7 @@ def create_handler(service: AchievementService, static_dir: Path = STATIC_DIR):
     """Create an HTTP handler bound to a specific service instance."""
 
     class OverlayRequestHandler(BaseHTTPRequestHandler):
-        server_version = "SteamAchievementOverlay/1.4.0"
+        server_version = "SteamAchievementOverlay/1.5.0"
         sys_version = ""
 
         def log_request(self, code="-", size="-") -> None:
@@ -76,10 +76,14 @@ def create_handler(service: AchievementService, static_dir: Path = STATIC_DIR):
                 self.serve_file(static_dir / "setup.html", "text/html; charset=utf-8")
             elif parsed.path == "/overlay":
                 self.serve_file(static_dir / "overlay.html", "text/html; charset=utf-8")
+            elif parsed.path == "/dashboard":
+                self.serve_file(static_dir / "dashboard.html", "text/html; charset=utf-8")
             elif parsed.path == "/api/status":
                 send_json(self, service.status())
             elif parsed.path == "/api/achievements":
                 send_json(self, service.snapshot())
+            elif parsed.path == "/api/pins":
+                send_json(self, {"ok": True, **service.pins_snapshot()})
             elif parsed.path == "/api/games/search":
                 query = parse_qs(parsed.query).get("q", [""])[0]
                 try:
@@ -134,6 +138,12 @@ def create_handler(service: AchievementService, static_dir: Path = STATIC_DIR):
             elif path == "/api/refresh":
                 success = service.request_refresh()
                 send_json(self, {"ok": success, "error": service.snapshot().get("error")})
+            elif path == "/api/pins":
+                try:
+                    pins = service.set_pins(payload.get("api_names"))
+                    send_json(self, {"ok": True, **pins})
+                except (ValueError, OSError) as exc:
+                    send_json(self, {"ok": False, "error": str(exc)}, 400)
             else:
                 send_json(self, {"ok": False, "error": "Not found."}, 404)
 

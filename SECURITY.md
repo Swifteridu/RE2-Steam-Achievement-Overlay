@@ -13,3 +13,7 @@ Include the affected version, steps to reproduce, expected behavior, and the pot
 The Steam Web API key is stored locally in `config.json` as plaintext. Keep that file private and do not commit it. If it is exposed, revoke it through the Steam Web API key page and create a replacement.
 
 The helper binds to IPv4 loopback (`127.0.0.1`) and is intended for use on a trusted local PC. It is not designed to be exposed to the public internet.
+
+## Local pin preferences
+
+Pinned achievement API names are stored in `pins.json` by Steam account and AppID. This file does not contain the Steam API key. It is local application state and should not be committed or shared unnecessarily.

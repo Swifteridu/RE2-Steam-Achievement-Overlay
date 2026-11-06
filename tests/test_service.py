@@ -14,8 +14,9 @@ class AchievementServiceTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.config_path = Path(self.temp_dir.name) / "config.json"
+        self.pins_path = Path(self.temp_dir.name) / "pins.json"
         self.client = Mock()
-        self.service = AchievementService(client=self.client, config_path=self.config_path)
+        self.service = AchievementService(client=self.client, config_path=self.config_path, pins_path=self.pins_path)
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -84,6 +85,36 @@ class AchievementServiceTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.service.connect(VALID_KEY, VALID_ID, str(APP_ID), "Example Game")
         self.assertEqual(self.config_path.read_text(encoding="utf-8"), '{"previous": true}')
+
+    def test_pins_are_saved_and_restored_for_same_game_and_account(self):
+        self.service._publish(self.fresh(unlocked=("A", "B")))
+        saved = self.service.set_pins(["A", "LOCKED"])
+        self.assertEqual(saved["api_names"], ["A", "LOCKED"])
+        self.assertEqual([item["api_name"] for item in saved["achievements"]], ["A", "LOCKED"])
+
+        restarted = AchievementService(client=Mock(), config_path=self.config_path, pins_path=self.pins_path)
+        restarted._publish(self.fresh(unlocked=("A", "B")))
+        self.assertEqual(restarted.snapshot()["pinned_api_names"], ["A", "LOCKED"])
+
+    def test_pins_are_scoped_to_steam_account_and_game(self):
+        self.service._publish(self.fresh(unlocked=("A",)))
+        self.service.set_pins(["A"])
+        self.service._publish(self.fresh(steamid="76561198000000001", unlocked=("B",)))
+        self.assertEqual(self.service.snapshot()["pinned_api_names"], [])
+        self.service._publish(self.fresh(appid=APP_ID + 1, unlocked=("C",)))
+        self.assertEqual(self.service.snapshot()["pinned_api_names"], [])
+        self.service._publish(self.fresh(unlocked=("A",)))
+        self.assertEqual(self.service.snapshot()["pinned_api_names"], ["A"])
+
+    def test_pin_limit_is_three(self):
+        self.service._publish(self.fresh(unlocked=("A", "B", "C", "D")))
+        with self.assertRaisesRegex(ValueError, "maximum of three"):
+            self.service.set_pins(["A", "B", "C", "D"])
+
+    def test_pins_must_belong_to_the_current_game(self):
+        self.service._publish(self.fresh(unlocked=("A",)))
+        with self.assertRaisesRegex(ValueError, "do not belong"):
+            self.service.set_pins(["NOT_AN_ACHIEVEMENT"])
 
 
 if __name__ == "__main__":

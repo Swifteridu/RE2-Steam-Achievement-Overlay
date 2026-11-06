@@ -32,3 +32,13 @@ Compatibility is limited to Steam games that expose achievement schemas and play
 - Updated project wording and examples to describe the tool as a Steam-wide achievement overlay rather than a single-game utility.
 - Kept the legacy v1.1 configuration migration for existing users.
 - Expanded tests for module boundaries, game search limits, configuration migration, multi-unlock notifications and local HTTP protections.
+
+## 1.5.0 — Separate OBS widget and achievement dashboard
+
+- Replaced the full achievement browser in the OBS source with a focused game title, completion count, percentage and progress bar.
+- Kept up to three optional pinned achievement cards beneath the compact progress summary.
+- Added a separate `/dashboard` page for the complete achievement library, All / Unlocked / Locked filters, text search and pin management.
+- Moved pin preferences from browser-local storage into local `pins.json`, scoped by SteamID64 and AppID so the normal browser dashboard and OBS Browser Source share the same pins.
+- Added one-time migration of v1.4.0 OBS-local pinned achievements when the new overlay first loads in OBS.
+- Added same-origin API endpoints for reading and updating pins, with a hard three-pin limit and validation against the current game's achievements.
+- Updated setup links and documentation to explain the split between the OBS widget and dashboard.

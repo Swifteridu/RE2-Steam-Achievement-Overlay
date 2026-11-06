@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import json
 import threading
-import time
 import uuid
 from pathlib import Path
 
 from .config import read_config, write_config, parse_app_id, validate_api_key
 from .constants import (
     CONFIG_PATH,
+    PINS_PATH,
     MAX_BACKOFF_SECONDS,
     POLL_SECONDS,
 )
@@ -19,10 +19,17 @@ from .steam_client import SteamClient
 class AchievementService:
     """Coordinates Steam data retrieval, cached state and unlock notifications."""
 
-    def __init__(self, client: SteamClient | None = None, config_path: Path = CONFIG_PATH) -> None:
+    def __init__(
+        self,
+        client: SteamClient | None = None,
+        config_path: Path = CONFIG_PATH,
+        pins_path: Path | None = None,
+    ) -> None:
         self.client = client or SteamClient()
         self.config_path = Path(config_path)
+        self.pins_path = Path(pins_path) if pins_path else Path(PINS_PATH)
         self._state_lock = threading.RLock()
+        self._pins_lock = threading.RLock()
         self._refresh_lock = threading.Lock()
         self._stop_event = threading.Event()
         self._refresh_event = threading.Event()
@@ -47,7 +54,84 @@ class AchievementService:
     def snapshot(self) -> dict:
         with self._state_lock:
             # Return a detached snapshot so handlers cannot mutate live state.
-            return json.loads(json.dumps(self._state))
+            result = json.loads(json.dumps(self._state))
+        pins = self.pins_snapshot()
+        result["pinned_api_names"] = pins["api_names"]
+        result["pinned_achievements"] = pins["achievements"]
+        return result
+
+    def _scope_key(self, steamid: str, appid: int) -> str:
+        return f"{steamid}:{appid}"
+
+    def _read_pins_document(self) -> dict:
+        try:
+            payload = json.loads(self.pins_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return {}
+        return payload if isinstance(payload, dict) else {}
+
+    def _write_pins_document(self, payload: dict) -> None:
+        self.pins_path.parent.mkdir(parents=True, exist_ok=True)
+        temp = self.pins_path.with_suffix(self.pins_path.suffix + ".tmp")
+        temp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        try:
+            temp.chmod(0o600)
+        except OSError:
+            pass
+        temp.replace(self.pins_path)
+
+    def pins_snapshot(self) -> dict:
+        with self._state_lock:
+            steamid = self._state.get("steamid")
+            appid = self._state.get("appid")
+            achievements = list(self._state.get("achievements", []))
+        if not steamid or not appid:
+            return {"api_names": [], "achievements": []}
+
+        key = self._scope_key(str(steamid), int(appid))
+        with self._pins_lock:
+            document = self._read_pins_document()
+            saved = document.get(key, [])
+        if not isinstance(saved, list):
+            saved = []
+        available = {item.get("api_name"): item for item in achievements if item.get("api_name")}
+        names = [name for name in saved[:3] if isinstance(name, str) and name in available]
+        return {
+            "api_names": names,
+            "achievements": [available[name] for name in names],
+        }
+
+    def set_pins(self, api_names) -> dict:
+        if not isinstance(api_names, list):
+            raise ValueError("Pinned achievements must be submitted as a list.")
+        if len(api_names) > 3:
+            raise ValueError("You can pin a maximum of three achievements.")
+        if any(not isinstance(name, str) or not name or len(name) > 256 for name in api_names):
+            raise ValueError("The pinned achievement list contains an invalid achievement ID.")
+        if len(set(api_names)) != len(api_names):
+            raise ValueError("An achievement can only be pinned once.")
+
+        with self._state_lock:
+            steamid = self._state.get("steamid")
+            appid = self._state.get("appid")
+            available = {
+                item.get("api_name")
+                for item in self._state.get("achievements", [])
+                if item.get("api_name")
+            }
+            connected = bool(self._state.get("connected"))
+        if not connected or not steamid or not appid:
+            raise ValueError("Connect a Steam game before managing pinned achievements.")
+        unknown = [name for name in api_names if name not in available]
+        if unknown:
+            raise ValueError("One or more pinned achievements do not belong to the currently selected game.")
+
+        key = self._scope_key(str(steamid), int(appid))
+        with self._pins_lock:
+            document = self._read_pins_document()
+            document[key] = list(api_names)
+            self._write_pins_document(document)
+        return self.pins_snapshot()
 
     def status(self) -> dict:
         config = read_config(self.config_path)

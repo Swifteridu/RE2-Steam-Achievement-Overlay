@@ -35,8 +35,8 @@
 - 🕹️ **Choose your game** – Search the Steam Store or enter a Steam AppID / Store URL.
 - 🏆 **Live achievement tracking** – Retrieves the selected game's achievement definitions and your unlock status from Steam.
 - 📊 **Completion counter** – Shows unlocked achievements, total achievements and completion percentage.
-- 🔍 **Achievement filters** – Separate unlocked and locked achievements.
-- 📌 **Pinned objectives** – Pin up to three achievements and switch between a focused pinned view and the complete achievement list. Pins are saved locally per Steam account and game.
+- 🗂️ **Separate achievement dashboard** – Browse the full list outside OBS with All, Unlocked and Locked filters plus text search.
+- 📌 **Pinned objectives** – Choose up to three achievements in the separate dashboard; the OBS widget can show them beneath the progress summary. Pins are saved locally per Steam account and game.
 - 🖼️ **Achievement details** – Shows Steam achievement icons, names and descriptions.
 - 🔔 **Unlock notifications** – Notifies viewers when new achievements are detected. Multiple unlocks between polls are queued individually.
 - 🔄 **Automatic synchronization** – Checks player progress every 30 seconds while Steam is responding.
@@ -74,7 +74,7 @@ Game search is limited to three results per query to keep selection quick and un
 It does **not** currently track achievements from Epic Games, GOG, PlayStation, Xbox, non-Steam games, or platform-specific achievement systems outside Steam.
 
 ### How to select a game
-<img width="1919" height="1079" alt="SteamAchievementSetup" src="https://github.com/user-attachments/assets/26c9443d-cffd-4870-8d35-121b88a756e9" />
+
 1. Search by the game's name in the setup page and select one of the up to three results; or
 2. Enter its numeric Steam AppID; or
 3. Paste its Steam Store URL, for example `https://store.steampowered.com/app/620/Portal_2/`.
@@ -112,6 +112,7 @@ The helper checks whether Steam returns an achievement schema when you connect. 
 3. Enter your API key and Steam profile URL (or SteamID64).
 4. Click **Connect Steam & Load Achievements**.
 5. The helper verifies that the selected game exposes achievement data and then loads your progress.
+6. Open the separate **Achievement Dashboard** at **http://127.0.0.1:8765/dashboard** to browse all achievements, filter by All / Unlocked / Locked, search by name or description, and choose up to three pins for OBS.
 
 Your Steam profile and **Game Details** privacy settings should be **Public** if Steam cannot return your achievement data. Some games still won't work even with public privacy settings if the developer does not expose the required stats.
 
@@ -130,22 +131,26 @@ The configuration file is stored as ordinary local JSON, not encrypted. Anyone w
    ```text
    http://127.0.0.1:8765/overlay
    ```
-<img width="1919" height="1079" alt="SteamAchievementOverlay" src="https://github.com/user-attachments/assets/56afa409-9765-4c46-834d-e22d0de10037" />
+
 4. Start with these dimensions:
 
    | Setting | Value |
    |---|---:|
-   | Width | 560 |
-   | Height | 900 |
+   | Width | 1100 |
+   | Height | 420 |
 
 5. Leave **Shutdown source when not visible** unchecked if you want it ready whenever you show it.
-6. Position and resize the source to fit your stream layout. Avoid shrinking it too far; the overlay now uses larger text and achievement cards to remain readable at typical streaming sizes.
+6. Position the source in your scene. The widget shows only the selected game's name, completion count and progress bar. If you have pinned achievements, up to three larger objective cards appear beneath the summary.
 
-The area outside the panel is transparent. Keep the command window running while streaming; it hosts the overlay and synchronizes your Steam data. Close it to stop the helper.
+The full achievement library and its filters are intentionally **not** part of the OBS source. This keeps the stream overlay readable and uncluttered. Keep the command window running while streaming; it hosts both browser pages and synchronizes your Steam data. Close it to stop the helper.
 
-### Pinning achievements
+### Manage achievements and pins
 
-In the overlay, use **All Achievements** to keep browsing the full unlocked/locked list. Select the star beside any achievement to pin it; up to three can be pinned per Steam account and game. The **Pinned** view shows only those selected objectives as larger cards. Pins are stored in the OBS browser's local storage on your PC and do not change your Steam achievements.
+Open **http://127.0.0.1:8765/dashboard** in your normal browser. This separate page contains the complete achievement list, with **All**, **Unlocked** and **Locked** filters and a text search. Select the star beside an achievement to pin it. You can pin up to three achievements per Steam account and game. The OBS overlay automatically picks up changes from the dashboard.
+
+Pins are stored by the local helper in `pins.json`, separately from your Steam API key. They are shared between the dashboard and OBS Browser Source, and `.gitignore` excludes the file from Git. Pins do not modify your actual Steam achievements.
+
+**Upgrading from v1.4.0:** the first time the new `/overlay` page opens in the existing OBS Browser Source, it attempts to migrate your previous browser-local pins into `pins.json`. After that, manage pins from the dashboard.
 
 ## 🔄 Synchronization
 
@@ -159,7 +164,7 @@ In the overlay, use **All Achievements** to keep browsing the full unlocked/lock
 | Multiple unlocks | Each newly detected achievement is queued for its own notification |
 | Game/account switch | New selection becomes a baseline; old unlocks do not trigger false notifications |
 
-The achievement schema cache is stored in the local `cache/` directory. It contains public game achievement definitions, not your Steam API key. It is excluded from Git by `.gitignore`.
+The achievement schema cache is stored in the local `cache/` directory. It contains public game achievement definitions, not your Steam API key. It is excluded from Git by `.gitignore`. Pin preferences are stored separately in `pins.json`, scoped by Steam account and AppID.
 
 ## 🔌 Steam API integration
 
@@ -183,6 +188,7 @@ See the official [Steamworks ISteamUserStats documentation](https://partner.stea
 - **Private responses:** responses containing account data use `Cache-Control: no-store`.
 - **Safe logging:** request logs omit query strings and request bodies, so credentials are not written to the console log.
 - **Local credentials:** the Steam API key is stored in `config.json` as plaintext. Keep that file private and out of GitHub.
+- **Local preferences:** pinned achievement IDs are stored in `pins.json`; it contains no Steam API key and is excluded from GitHub.
 
 If you accidentally expose your API key, revoke it through the [Steam Web API Key page](https://steamcommunity.com/dev/apikey/) and create a replacement. See [SECURITY.md](SECURITY.md) for vulnerability-reporting guidance.
 

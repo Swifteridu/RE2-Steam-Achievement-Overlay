@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam Achievement Dashboard</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0e0f;--panel:#151a1b;--panel2:#1b2223;--line:#394143;--red:#c52b31;--red2:#ef555d;--text:#f2efe9;--muted:#aeb6b2;--green:#b7d9bf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#252b2c 0,#111617 44%,#090b0c 100%);color:var(--text);font:15px/1.45 "Segoe UI",Arial,sans-serif;min-height:100vh}
+a{color:inherit}.wrap{width:min(1420px,calc(100% - 44px));margin:0 auto;padding:30px 0 60px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}.brand{font-size:12px;letter-spacing:.24em;color:#e36b71;font-weight:950;text-transform:uppercase}.links{display:flex;gap:10px;flex-wrap:wrap}.link{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border:1px solid #465052;background:#111718;text-decoration:none;color:#d7dcd8;font-size:12px;font-weight:800;letter-spacing:.06em}.link:hover{border-color:#c64b52;color:#fff}
+.hero{background:linear-gradient(115deg,rgba(32,38,39,.98),rgba(10,13,14,.98) 78%);border:1px solid #454e50;border-top:5px solid var(--red);padding:24px 28px 20px;box-shadow:0 18px 55px #0008}.hero-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.game-label{font-size:11px;letter-spacing:.2em;color:#dc7277;font-weight:900;text-transform:uppercase}.game-name{font-size:clamp(25px,3vw,40px);font-weight:950;line-height:1.1;letter-spacing:.03em;text-transform:uppercase;margin-top:5px;overflow-wrap:anywhere}.appid{font-size:11px;border:1px solid #596466;padding:6px 9px;color:#b9c1bd;white-space:nowrap}.stats{display:flex;align-items:flex-end;justify-content:space-between;margin-top:20px;gap:16px}.count{font-size:42px;line-height:1;font-weight:950;font-variant-numeric:tabular-nums}.count span{font-size:20px;color:#bfc7c2;font-weight:650}.percent{font-size:19px;font-weight:900}.bar{height:9px;background:#414849;margin-top:12px}.bar-fill{height:100%;background:linear-gradient(90deg,#7e1e24,#ed555d);width:0;transition:width .4s}.subline{display:flex;justify-content:space-between;gap:12px;margin-top:8px;color:#aab2ae;font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:850}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:24px 0 14px;flex-wrap:wrap}.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid #465052;background:#141a1b;color:#c1c8c4;padding:11px 16px;font-size:12px;letter-spacing:.09em;font-weight:950;cursor:pointer}.filter.active{background:linear-gradient(110deg,#7a1c22,#a92a31);border-color:#d34c53;color:white}.filter span{margin-left:5px;color:#e6e3dd}.filter.active span{color:white}.search{width:min(340px,100%);padding:11px 13px;background:#101516;border:1px solid #465052;color:#fff;font:inherit;outline:none}.search:focus{border-color:#c64b52}
+.pin-summary{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 16px;margin-bottom:13px;background:rgba(25,31,31,.88);border:1px solid #3d4747}.pin-title{font-size:12px;letter-spacing:.12em;font-weight:950;text-transform:uppercase}.pin-count{color:#e27a7f;font-weight:900;font-size:12px;letter-spacing:.1em}.pin-help{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.achievement{display:flex;align-items:center;gap:15px;min-width:0;min-height:118px;padding:14px;background:linear-gradient(110deg,rgba(32,39,39,.97),rgba(16,20,21,.97));border:1px solid rgba(207,216,208,.16);border-left:3px solid #606968}.achievement.unlocked{border-left-color:#9fc6a8}.achievement img{width:76px;height:76px;flex:0 0 76px;object-fit:contain;background:#090c0d;border:1px solid #485050;padding:3px}.copy{flex:1;min-width:0}.name{font-size:18px;line-height:1.15;font-weight:900;overflow-wrap:anywhere}.description{font-size:13px;line-height:1.35;color:#bac2bd;margin-top:6px}.state{display:inline-block;margin-top:8px;border:1px solid #59665d;background:#17231b;color:#b8d8c0;padding:3px 7px;font-size:9px;font-weight:950;letter-spacing:.1em}.achievement.locked .state{border-color:#754348;background:#291719;color:#e9b0b2}.pin-btn{align-self:center;flex:0 0 auto;min-width:48px;min-height:48px;border:1px solid #555f5f;background:#111718;color:#b9c1bc;font-size:25px;cursor:pointer}.pin-btn:hover{border-color:#d3a75b;color:#f2ca79}.pin-btn.pinned{border-color:#a77e36;background:#302616;color:#f4cb75}.empty{grid-column:1/-1;padding:45px 20px;text-align:center;color:#bdc4bf;border:1px dashed #485252;background:#131819;font-size:15px}.notice{min-height:22px;margin:10px 0;color:#d8b47b;font-size:13px}.footer{margin-top:28px;color:#77817d;font-size:11px;letter-spacing:.08em;text-align:center}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.wrap{width:min(100% - 24px,720px);padding-top:16px}.hero{padding:19px 18px}}
+@media(max-width:520px){.topline,.hero-top,.tools{align-items:stretch;flex-direction:column}.links{width:100%}.link{flex:1}.achievement{gap:10px;padding:10px}.achievement img{width:58px;height:58px;flex-basis:58px}.name{font-size:16px}.description{font-size:12px}.pin-btn{min-width:42px;min-height:42px}.count{font-size:35px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="topline"><div class="brand">Steam · Achievement dashboard</div><div class="links"><a class="link" href="/overlay" target="_blank" rel="noreferrer">OPEN OBS OVERLAY ↗</a><a class="link" href="/" target="_blank" rel="noreferrer">SETUP ↗</a></div></div>
+ <section class="hero">
+  <div class="hero-top"><div><div class="game-label">Selected Steam game</div><div class="game-name" id="gameName">Steam Achievement Tracker</div></div><div class="appid" id="appid">STEAM</div></div>
+  <div class="stats"><div class="count" id="count">-- <span>/ --</span></div><div class="percent" id="percent">--%</div></div>
+  <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+  <div class="subline"><span>Achievement completion</span><span id="remaining">Waiting for Steam…</span></div>
+ </section>
+ <div class="tools">
+  <div class="filters" role="group" aria-label="Filter achievements">
+   <button class="filter active" data-filter="all">ALL <span id="allCount">0</span></button>
+   <button class="filter" data-filter="unlocked">UNLOCKED <span id="unlockedCount">0</span></button>
+   <button class="filter" data-filter="locked">LOCKED <span id="lockedCount">0</span></button>
+  </div>
+  <input id="search" class="search" type="search" placeholder="Search achievements…" aria-label="Search achievements">
+ </div>
+ <div class="pin-summary"><div><div class="pin-title">Pinned for OBS</div><div class="pin-help">Choose up to three achievements. They appear beneath the progress bar in your OBS overlay.</div></div><div class="pin-count" id="pinCount">0 / 3</div></div>
+ <div class="notice" id="notice" aria-live="polite"></div>
+ <main class="grid" id="achievementGrid"><div class="empty">Connect Steam in the setup page to load your achievements.</div></main>
+ <div class="footer">PINS ARE SAVED LOCALLY ON THIS PC · STEAM ACHIEVEMENT OVERLAY BY SWIFTERIDU</div>
+</div>
+<script>
+const grid=document.getElementById('achievementGrid');
+let currentFilter='all',currentData=null,pinnedIds=[],noticeTimer=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function showNotice(message){const el=document.getElementById('notice');el.textContent=message;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{el.textContent='';},5000);}
+function setHeader(data){
+ const total=Number(data.total||0),unlocked=Number(data.unlocked||0),remaining=Math.max(0,total-unlocked),percent=total?Math.round(unlocked/total*100):0;
+ document.getElementById('gameName').textContent=data.game_name||'Steam Achievement Tracker';
+ document.getElementById('appid').textContent=data.appid?`APP ${data.appid}`:'STEAM';
+ document.getElementById('count').innerHTML=`${unlocked} <span>/ ${total}</span>`;
+ document.getElementById('percent').textContent=`${percent}%`;
+ document.getElementById('barFill').style.width=`${percent}%`;
+ document.getElementById('remaining').textContent=total?`${remaining} REMAINING`:((data.status==='setup_required')?'NOT CONNECTED':'NO ACHIEVEMENTS');
+ document.getElementById('allCount').textContent=total;
+ document.getElementById('unlockedCount').textContent=unlocked;
+ document.getElementById('lockedCount').textContent=remaining;
+}
+function render(){
+ if(!currentData)return;
+ const data=currentData;setHeader(data);
+ if(!data.connected){grid.innerHTML=`<div class="empty">${esc(data.error||'Connect Steam in the setup page first.')}</div>`;return;}
+ const achievements=Array.isArray(data.achievements)?data.achievements:[];
+ const term=document.getElementById('search').value.trim().toLocaleLowerCase();
+ const visible=achievements.filter(a=>{
+  const statusMatch=currentFilter==='all'||(currentFilter==='unlocked'?a.unlocked:!a.unlocked);
+  const textMatch=!term||`${a.name||''} ${a.description||''}`.toLocaleLowerCase().includes(term);
+  return statusMatch&&textMatch;
+ });
+ document.getElementById('pinCount').textContent=`${pinnedIds.length} / 3`;
+ document.querySelectorAll('.filter').forEach(button=>button.classList.toggle('active',button.dataset.filter===currentFilter));
+ if(!visible.length){grid.innerHTML='<div class="empty">No achievements match this filter.</div>';return;}
+ grid.innerHTML=visible.map(a=>{
+  const isPinned=pinnedIds.includes(a.api_name);
+  const icon=a.unlocked?(a.icon||a.icon_gray):(a.icon_gray||a.icon);
+  return `<article class="achievement ${a.unlocked?'unlocked':'locked'}">
+   <img src="${esc(icon||'')}" alt="" onerror="this.style.visibility='hidden'">
+   <div class="copy"><div class="name">${esc(a.name)}</div><div class="description">${esc(a.description||'Achievement details unavailable.')}</div><span class="state">${a.unlocked?'UNLOCKED':'LOCKED'}</span></div>
+   <button class="pin-btn ${isPinned?'pinned':''}" type="button" data-pin="${esc(a.api_name)}" aria-label="${isPinned?'Unpin':'Pin'} ${esc(a.name)}" title="${isPinned?'Unpin achievement':'Pin achievement for OBS'}">${isPinned?'★':'☆'}</button>
+  </article>`;
+ }).join('');
+}
+async function savePins(next){
+ const response=await fetch('/api/pins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_names:next})});
+ const data=await response.json();
+ if(!response.ok||!data.ok)throw new Error(data.error||'Could not save pinned achievements.');
+ pinnedIds=data.api_names||[];
+ if(currentData){currentData.pinned_api_names=pinnedIds;currentData.pinned_achievements=data.achievements||[];}
+ render();
+}
+grid.addEventListener('click',async event=>{
+ const button=event.target.closest('[data-pin]');if(!button||!currentData?.connected)return;
+ const apiName=button.dataset.pin;let next=[...pinnedIds];
+ if(next.includes(apiName))next=next.filter(id=>id!==apiName);
+ else{if(next.length>=3){showNotice('You can pin up to three achievements. Unpin one first.');return;}next.push(apiName);}
+ button.disabled=true;
+ try{await savePins(next);showNotice(`${next.includes(apiName)?'Achievement pinned for OBS.':'Achievement unpinned.'}`);}
+ catch(error){showNotice(error.message);button.disabled=false;}
+});
+document.querySelectorAll('.filter').forEach(button=>button.addEventListener('click',()=>{currentFilter=button.dataset.filter;render();}));
+document.getElementById('search').addEventListener('input',render);
+async function fetchData(){
+ try{const response=await fetch('/api/achievements',{cache:'no-store'});if(!response.ok)throw new Error('Could not load achievements.');const data=await response.json();currentData=data;pinnedIds=Array.isArray(data.pinned_api_names)?data.pinned_api_names:[];render();}
+ catch(error){grid.innerHTML=`<div class="empty">Local helper offline. Start <strong>start_overlay.bat</strong> and keep it running.</div>`;}
+}
+fetchData();setInterval(fetchData,5000);
+</script>
+</body>
+</html>

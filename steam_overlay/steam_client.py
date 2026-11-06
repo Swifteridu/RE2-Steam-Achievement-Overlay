@@ -29,7 +29,7 @@ class SteamClient:
         self.opener = opener
         self._schema_memory: dict[int, dict] = {}
 
-    def _read_url(self, url: str, *, user_agent: str = "Swifteridu-Steam-Achievement-Overlay/1.4.0") -> dict:
+    def _read_url(self, url: str, *, user_agent: str = "Swifteridu-Steam-Achievement-Overlay/1.5.0") -> dict:
         request = Request(url, headers={"User-Agent": user_agent, "Accept": "application/json"})
         try:
             with self.opener(request, timeout=15) as response:
