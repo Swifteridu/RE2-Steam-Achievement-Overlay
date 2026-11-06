@@ -106,6 +106,7 @@ The helper checks whether Steam returns an achievement schema when you connect. 
 > Windows may display an "Unknown Publisher" warning when launching `start_overlay.bat`. The batch file is not digitally signed, so Windows cannot verify a publisher. This warning is not itself a malware detection. Review the source code before running software downloaded from the internet.
 
 ### 2. Select a game and connect Steam
+<img width="1905" height="939" alt="image" src="https://github.com/user-attachments/assets/0e9acf1c-5dac-41ed-aa42-b49731d9ee5a" />
 
 1. On the setup page, search for your game and select it from the results. Alternatively, enter its Steam AppID or Steam Store URL.
 2. Create a Steam Web API key at the [Steam Web API Key page](https://steamcommunity.com/dev/apikey/).
@@ -115,12 +116,13 @@ The helper checks whether Steam returns an achievement schema when you connect. 
 6. Open the separate **Achievement Dashboard** at **http://127.0.0.1:8765/dashboard** to browse all achievements, filter by All / Unlocked / Locked, search by name or description, and choose up to three pins for OBS.
 
 Your Steam profile and **Game Details** privacy settings should be **Public** if Steam cannot return your achievement data. Some games still won't work even with public privacy settings if the developer does not expose the required stats.
-
+<img width="1904" height="940" alt="image" src="https://github.com/user-attachments/assets/5fd261ee-255a-4c55-aac6-8e1ef2c9b69b" />
 The API key is saved locally in `config.json`. It is used by the local helper to communicate with Steam; it is never sent to the OBS overlay page or displayed to viewers. Do not publish, share or commit `config.json`. The repository's `.gitignore` excludes it by default.
 
 The configuration file is stored as ordinary local JSON, not encrypted. Anyone with access to your Windows account or files may be able to read it. Use the overlay only on a trusted PC and keep your Windows account protected.
 
 **Existing v1.1 configuration:** if you are upgrading from the original release, copy your old `config.json` into the new project folder. The helper recognizes that legacy configuration and migrates its original game selection (its previously hard-coded AppID) automatically. You can then choose another Steam game from the setup page. Never upload the config file to GitHub.
+<img width="1919" height="945" alt="image" src="https://github.com/user-attachments/assets/1d7aed02-ee7a-4fad-b927-2d0cb9244565" />
 
 ### 3. Add the overlay to OBS
 
