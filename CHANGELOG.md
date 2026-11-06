@@ -1,13 +1,5 @@
 # Changelog
 
-## 1.4.0 — Readable overlay, pinned objectives and full-game search
-
-- Increased achievement card sizes, icon dimensions, headings and description text for better stream readability.
-- Added a dedicated Pinned view for up to three achievements, with pins saved locally per Steam account and game.
-- Preserved the complete achievement list and the All / Unlocked / Locked filters.
-- Changed Steam Store search to verify candidate items through AppDetails and return full games only; DLC, demos, soundtracks, software and unknown item types are excluded.
-- Updated the project disclaimer to refer to rights holders collectively rather than naming individual publishers.
-- Updated OBS Browser Source recommended dimensions to 560 × 900.
 
 ## 1.2.0 — Universal Steam game selection
 
@@ -32,6 +24,15 @@ Compatibility is limited to Steam games that expose achievement schemas and play
 - Updated project wording and examples to describe the tool as a Steam-wide achievement overlay rather than a single-game utility.
 - Kept the legacy v1.1 configuration migration for existing users.
 - Expanded tests for module boundaries, game search limits, configuration migration, multi-unlock notifications and local HTTP protections.
+
+## 1.4.0 — Readable overlay, pinned objectives and full-game search
+
+- Increased achievement card sizes, icon dimensions, headings and description text for better stream readability.
+- Added a dedicated Pinned view for up to three achievements, with pins saved locally per Steam account and game.
+- Preserved the complete achievement list and the All / Unlocked / Locked filters.
+- Changed Steam Store search to verify candidate items through AppDetails and return full games only; DLC, demos, soundtracks, software and unknown item types are excluded.
+- Updated the project disclaimer to refer to rights holders collectively rather than naming individual publishers.
+- Updated OBS Browser Source recommended dimensions to 560 × 900.
 
 ## 1.5.0 — Separate OBS widget and achievement dashboard
 
